@@ -32,6 +32,7 @@ import javax.net.ssl.X509TrustManager;
 public class Connector {
     private static final int TIMEOUT = 10000;
     private static final int BUFFER_SIZE = 4096;
+    private static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36";
     private static TrustManager[] s_trustAllCerts = new TrustManager[] { new X509TrustManager() {
         public X509Certificate[] getAcceptedIssuers() {
             return null;
@@ -73,8 +74,8 @@ public class Connector {
         httpURLConnection.setDoInput(true);
         httpURLConnection.setDoOutput(true);
         httpURLConnection.setRequestProperty("Cookie", getCookieFromAppCookieManager(uri));
-        httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
-        httpURLConnection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+        setCommonRequestHeader(httpURLConnection);
+
         if (!TextUtils.isEmpty(referer)) {
             httpURLConnection.setRequestProperty("Referer", referer);
         }
@@ -105,7 +106,7 @@ public class Connector {
             // open the new connnection again
             httpURLConnection = (HttpURLConnection) new URL(newUrl).openConnection();
             httpURLConnection.setRequestProperty("Cookie", cookies);
-            httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
+            setCommonRequestHeader(httpURLConnection);
             httpURLConnection.setReadTimeout(TIMEOUT);
             httpURLConnection.setConnectTimeout(TIMEOUT);
             httpURLConnection.setRequestMethod("POST");
@@ -140,8 +141,7 @@ public class Connector {
         URL urL = new URL(uri);
         HttpURLConnection httpURLConnection = (HttpURLConnection) urL.openConnection();
         httpURLConnection.setRequestProperty("Cookie", getCookieFromAppCookieManager(uri));
-        httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
-        httpURLConnection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+        setCommonRequestHeader(httpURLConnection);
         if (!TextUtils.isEmpty(referer)) {
             httpURLConnection.setRequestProperty("Referer", referer);
         }
@@ -161,7 +161,7 @@ public class Connector {
             // open the new connnection again
             httpURLConnection = (HttpURLConnection) new URL(newUrl).openConnection();
             httpURLConnection.setRequestProperty("Cookie", cookies);
-            httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
+            httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
             httpURLConnection.setReadTimeout(TIMEOUT);
             httpURLConnection.setConnectTimeout(TIMEOUT);
             httpURLConnection.setRequestMethod("GET");
@@ -175,6 +175,18 @@ public class Connector {
             httpURLConnection.disconnect();
             throw new Exception();
         }
+    }
+
+    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection, URL url){
+        httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
+        httpURLConnection.setRequestProperty("Upgrade-Insecure-Requests", "1");
+        httpURLConnection.setRequestProperty("Connection", "close");
+
+        return httpURLConnection;
+    }
+
+    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection){
+        return setCommonRequestHeader(httpURLConnection, httpURLConnection.getURL());
     }
 
     private static String convertStreamToString(InputStream is,
@@ -199,7 +211,7 @@ public class Connector {
             HttpURLConnection httpURLConnection = (HttpURLConnection) urL.openConnection();
             httpURLConnection.setRequestProperty("Cookie", getCookieFromAppCookieManager(file_url));
             httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
+            httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
             httpURLConnection.setReadTimeout(TIMEOUT);
             httpURLConnection.setConnectTimeout(TIMEOUT);
             httpURLConnection.setRequestMethod("GET");

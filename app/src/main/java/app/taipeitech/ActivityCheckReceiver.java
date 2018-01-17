@@ -28,8 +28,8 @@ public class ActivityCheckReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
         if (bundle.get("action").equals("app.taipeitech.action.ACTIVITY_CHECK")) {
-            CheckTask task = new CheckTask(context);
-            task.execute();
+//            CheckTask task = new CheckTask(context);
+//            task.execute();
         }
     }
 

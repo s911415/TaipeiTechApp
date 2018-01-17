@@ -1,9 +1,9 @@
 package app.taipeitech.utility;
 
+import android.text.TextUtils;
 import app.taipeitech.course.data.Semester;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.StudentCourse;
-
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -12,14 +12,14 @@ import java.util.HashMap;
 
 public class CourseConnector {
     private static boolean isLogin = false;
-    private static final String POST_COURSES_URI = "http://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
+    private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSES_URI = "http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Select.jsp";
 
     public static String loginCourse() throws Exception {
         try {
             isLogin = false;
-            String result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "http://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
+            String result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "https://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
             TagNode tagNode;
             tagNode = new HtmlCleaner().clean(result);
             TagNode[] nodes = tagNode.getElementsByAttValue("name",
@@ -119,18 +119,68 @@ public class CourseConnector {
             TagNode[] rows = tables[0].getElementsByName("tr", true);
             for (TagNode row : rows) {
                 TagNode[] cols = row.getElementsByName("th", true);
-                String d = cols[0].getText().toString();
+                StringBuilder sb = new StringBuilder();
+                String title = cleanUpString(cols[0].getText().toString());
+                String content = null;
+
+                sb.append(title);
                 cols = row.getElementsByName("td", true);
-                d = d + "：" + cols[0].getText().toString();
-                d = d.replace("　", " ");
-                d = d.replace("\n", " ");
-                courseDetail.add(d);
+                TagNode[] links = cols[0].getElementsByName("a", false);
+
+                if (links.length > 0) {
+                    ArrayList<String> linksContent = new ArrayList<>();
+                    for (TagNode a : links)
+                        linksContent.add(cleanUpString(a.getText().toString()));
+
+                    int lastIndex = linksContent.size() - 1;
+                    if (title.equals("授課教師") && linksContent.get(lastIndex).startsWith("《查詢")) {
+                        linksContent.remove(lastIndex);
+                    }
+
+                    content = TextUtils.join("/", linksContent);
+                } else {
+                    content = cleanUpString(cols[0].getText().toString());
+                }
+
+                if (title.equals("類別") && content != null) {
+                    content = mappingCourseType(content) + " " + content;
+                }
+
+                if (content != null) {
+                    sb.append("：");
+                    sb.append(content);
+                }
+
+                courseDetail.add(sb.toString());
             }
             return courseDetail;
         } catch (Exception e) {
             isLogin = false;
             throw new Exception("課程資訊讀取時發生錯誤");
         }
+    }
+
+    private static String mappingCourseType(String str) {
+        switch (str) {
+            case "○":
+                return "必 (共同)";
+            case "△":
+                return "必 (共同)";
+            case "☆":
+                return "選 (共同)";
+            case "●":
+                return "必 (專業)";
+            case "▲":
+                return "必 (專業)";
+            case "★":
+                return "選 (專業)";
+        }
+
+        return "";
+    }
+
+    private static String cleanUpString(String str) {
+        return Utility.cleanString(str).replaceAll("\\s", "").trim();
     }
 
     public static ArrayList<String> GetClassmate(String courseNo)
