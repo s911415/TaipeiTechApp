@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import app.taipeitech.MainApplication;
 
 public class Model {
-
     private static final String ACCOUNT_NAME = "account";
     private static final String PASSWORD_NAME = "password";
     private static final String STUDENT_COURSE_NAME = "studentCourse";
@@ -62,16 +61,16 @@ public class Model {
     }
 
     public String getAccount() {
-        return MainApplication.readSetting(ACCOUNT_NAME);
+        return MainApplication.readSettingAndDecrypt(ACCOUNT_NAME);
     }
 
     public String getPassword() {
-        return MainApplication.readSetting(PASSWORD_NAME);
+        return MainApplication.readSettingAndDecrypt(PASSWORD_NAME);
     }
 
     public void saveAccountPassword(String account, String password) {
-        MainApplication.writeSetting(ACCOUNT_NAME, account);
-        MainApplication.writeSetting(PASSWORD_NAME, password);
+        MainApplication.writeSettingWithEncrypt(ACCOUNT_NAME, account);
+        MainApplication.writeSettingWithEncrypt(PASSWORD_NAME, password);
     }
 
     public void deleteAccountPassword() {
