@@ -9,9 +9,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.RemoteViews;
-
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.Model;
 import app.taipeitech.model.StudentCourse;
@@ -210,20 +207,10 @@ public class CourseWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(context.getString(R.string.analytics_category_course_widget))
-                .setAction(context.getString(R.string.analytics_action_add))
-                .build());
     }
 
     @Override
     public void onDisabled(Context context) {
         super.onDisabled(context);
-        Tracker tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(context.getString(R.string.analytics_category_course_widget))
-                .setAction(context.getString(R.string.analytics_action_remove))
-                .build());
     }
 }

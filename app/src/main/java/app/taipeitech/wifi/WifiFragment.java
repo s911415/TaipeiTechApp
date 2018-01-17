@@ -2,12 +2,7 @@ package app.taipeitech.wifi;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -23,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.HitBuilders;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.MainActivity;
 import app.taipeitech.MainApplication;
@@ -191,29 +184,19 @@ public class WifiFragment extends BaseFragment implements ServiceConnection,
 
     @Override
     public void onClick(View v) {
-        if(!Utility.checkAccount(getActivity())) {
+        if (!Utility.checkAccount(getActivity())) {
             return;
         }
         int id = v.getId();
         boolean result = startService();
         switch (id) {
             case R.id.refresh_button:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_wifi))
-                        .setAction(getString(R.string.analytics_action_refresh))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
                 if (result) {
                     WifiUtility.testCount = 0;
                     scanWifi();
                 }
                 break;
             case R.id.login_button:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_wifi))
-                        .setAction(getString(R.string.analytics_action_login))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
                 if (result) {
                     try {
                         String ssid = WifiUtility.getCurrentSSID(activityContext);

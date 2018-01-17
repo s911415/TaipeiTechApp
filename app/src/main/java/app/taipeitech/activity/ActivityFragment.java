@@ -5,17 +5,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.HitBuilders;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.R;
 import app.taipeitech.model.ActivityList;
@@ -62,11 +55,11 @@ public class ActivityFragment extends BaseFragment implements
 
             @Override
             public void onClick(View view) {
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_activity))
-                        .setAction(getString(R.string.analytics_action_update))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
+//                tracker.send(new HitBuilders.EventBuilder()
+//                        .setCategory(getString(R.string.analytics_category_activity))
+//                        .setAction(getString(R.string.analytics_action_update))
+//                        .setLabel(getString(R.string.analytics_label_click))
+//                        .build());
                 updateActivity();
             }
         });
@@ -147,11 +140,11 @@ public class ActivityFragment extends BaseFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_update:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_activity))
-                        .setAction(getString(R.string.analytics_action_update))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
+//                tracker.send(new HitBuilders.EventBuilder()
+//                        .setCategory(getString(R.string.analytics_category_activity))
+//                        .setAction(getString(R.string.analytics_action_update))
+//                        .setLabel(getString(R.string.analytics_label_click))
+//                        .build());
                 updateActivity();
                 break;
         }
@@ -193,11 +186,11 @@ public class ActivityFragment extends BaseFragment implements
 
     @Override
     public void onRefresh() {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(getString(R.string.analytics_category_activity))
-                .setAction(getString(R.string.analytics_action_update))
-                .setLabel(getString(R.string.analytics_label_swipe))
-                .build());
+//        tracker.send(new HitBuilders.EventBuilder()
+//                .setCategory(getString(R.string.analytics_category_activity))
+//                .setAction(getString(R.string.analytics_action_update))
+//                .setLabel(getString(R.string.analytics_label_swipe))
+//                .build());
         updateActivity();
     }
 

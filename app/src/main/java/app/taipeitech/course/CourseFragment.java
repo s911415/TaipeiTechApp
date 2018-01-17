@@ -10,23 +10,14 @@ import android.support.v7.app.AlertDialog.Builder;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.HitBuilders;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.R;
 import app.taipeitech.course.CourseTableLayout.TableInitializeListener;
@@ -146,7 +137,7 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
         if (!TextUtils.isEmpty(sid)) {
             if (WifiUtility.isNetworkAvailable(getActivity())) {
                 closeSoftKeyboard();
-                if(Utility.checkAccount(getActivity())) {
+                if (Utility.checkAccount(getActivity())) {
                     lastSid = sid;
                     QuerySemesterTask querySemesterTask = new QuerySemesterTask(this);
                     querySemesterTask.execute(sid);
@@ -164,7 +155,7 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
         if (!TextUtils.isEmpty(sid)) {
             if (WifiUtility.isNetworkAvailable(getActivity())) {
                 closeSoftKeyboard();
-                if(Utility.checkAccount(getActivity())) {
+                if (Utility.checkAccount(getActivity())) {
                     SearchCourseTask searchCourseTask = new SearchCourseTask(this);
                     searchCourseTask.execute(sid, semester.getYear(), semester.getSemester());
                 }
@@ -209,11 +200,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
 
     public void startCourseDetail(Object object) {
         if (object instanceof Boolean) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getString(R.string.analytics_category_course))
-                    .setAction(getString(R.string.analytics_action_detail))
-                    .setLabel("CourseNo :" + selectedCourseNo)
-                    .build());
             Intent i = new Intent(getActivity(),
                     CourseDetailActivity.class);
             i.putExtra("CourseNo", selectedCourseNo);
@@ -247,11 +233,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
         if (object instanceof StudentCourse) {
             StudentCourse result = (StudentCourse) object;
             Model.getInstance().setStudentCourse(result);
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getString(R.string.analytics_category_course))
-                    .setAction(getString(R.string.analytics_action_query))
-                    .setLabel(result.getYear() + "-" + result.getSemester() + "-" + result.getSid())
-                    .build());
             StudentCourse studentCourse = Model.getInstance().getStudentCourse();
             showCourse(studentCourse);
             Snackbar.make(fragmentView.findViewById(R.id.main_layout), getText(R.string.course_offline_save)
@@ -259,11 +240,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
                 @Override
                 public void onClick(View v) {
                     StudentCourse course = Model.getInstance().getStudentCourse();
-                    tracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(getString(R.string.analytics_category_course))
-                            .setAction(getString(R.string.analytics_action_save_snackbar))
-                            .setLabel(course.getYear() + "-" + course.getSemester() + "-" + course.getSid())
-                            .build());
                     saveStudentCourse();
                 }
             }).setActionTextColor(getResources().getColor(R.color.dark_red)).show();
@@ -282,7 +258,7 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
                         Toast.LENGTH_LONG).show();
             } else {
                 if (WifiUtility.isNetworkAvailable(getActivity())) {
-                    if(Utility.checkAccount(getActivity())) {
+                    if (Utility.checkAccount(getActivity())) {
                         CourseDetailTask courseDetailTask = new CourseDetailTask(CourseFragment.this);
                         courseDetailTask.execute(selectedCourseNo);
                     }
@@ -359,11 +335,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
             case R.id.item_save:
                 if (Model.getInstance().getStudentCourse() != null) {
                     StudentCourse course = Model.getInstance().getStudentCourse();
-                    tracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(getString(R.string.analytics_category_course))
-                            .setAction(getString(R.string.analytics_action_save))
-                            .setLabel(course.getYear() + "-" + course.getSemester() + "-" + course.getSid())
-                            .build());
                     saveStudentCourse();
                 } else {
                     Toast.makeText(getActivity(), "目前無任何課表，無法設為離線瀏覽！",
@@ -371,10 +342,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
                 }
                 break;
             case R.id.item_clear:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_course))
-                        .setAction(getString(R.string.analytics_action_clear))
-                        .build());
                 Model.getInstance().deleteStudentCourse();
                 Intent intent = new Intent(
                         Constants.ACTION_COURSEWIDGET_UPDATE_STR);

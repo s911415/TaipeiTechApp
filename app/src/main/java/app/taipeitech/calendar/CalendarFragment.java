@@ -7,17 +7,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.HitBuilders;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.R;
 import app.taipeitech.model.Model;
@@ -32,7 +25,6 @@ import java.util.Locale;
 
 public class CalendarFragment extends BaseFragment implements OnClickListener,
         OnPageChangeListener {
-
     private static View fragmentView = null;
     private static ProgressDialog progressDialog = null;
     private Calendar calendar = Calendar.getInstance();
@@ -120,11 +112,6 @@ public class CalendarFragment extends BaseFragment implements OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.start_button:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_calendar))
-                        .setAction(getString(R.string.analytics_action_update))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
                 updateCalendar();
                 break;
             case R.id.leftButton:
@@ -172,11 +159,6 @@ public class CalendarFragment extends BaseFragment implements OnClickListener,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_update:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_calendar))
-                        .setAction(getString(R.string.analytics_action_update))
-                        .setLabel(getString(R.string.analytics_label_click))
-                        .build());
                 updateCalendar();
                 break;
         }

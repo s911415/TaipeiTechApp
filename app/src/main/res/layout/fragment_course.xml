@@ -39,15 +39,15 @@
                 android:textSize="@dimen/textMedium"/>
 
             <app.taipeitech.course.SemesterSelector
-                style="@style/Widget.AppCompat.Spinner.Underlined"
-                android:id="@+id/semester"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:prompt="@string/semester"
-                android:textSize="@dimen/textMedium"/>
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:id="@+id/semester"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:prompt="@string/semester"
+                    android:textSize="@dimen/textMedium"/>
         </LinearLayout>
 
         <View

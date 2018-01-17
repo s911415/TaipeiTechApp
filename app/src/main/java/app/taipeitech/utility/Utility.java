@@ -158,7 +158,7 @@ public class Utility {
         s = s.replace(System.getProperty("line.separator"), " ");
         s = s.replaceAll("(\r\n|\r|\n|\n\r)", "");
         s = s.replace(" ", "");
-        return s;
+        return s.trim();
     }
 
     public static String cleanSpace(String s) {

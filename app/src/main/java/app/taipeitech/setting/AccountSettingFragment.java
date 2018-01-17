@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.HitBuilders;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.PortalActivity;
 import app.taipeitech.R;
@@ -71,11 +69,6 @@ public class AccountSettingFragment extends BaseFragment implements
                 Toast.makeText(getActivity(), R.string.save_success, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.clear_button:
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.analytics_category_setting))
-                        .setAction(getString(R.string.analytics_action_clear))
-                        .setLabel(Model.getInstance().getAccount())
-                        .build());
                 Model.getInstance().deleteAccountPassword();
                 refreshView();
                 break;
@@ -145,11 +138,6 @@ public class AccountSettingFragment extends BaseFragment implements
                 .findViewById(R.id.password_edittext);
         String passwordText = passwordEditText.getText().toString();
         if (accountText.length() > 0 && passwordText.length() > 0) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getString(R.string.analytics_category_setting))
-                    .setAction(getString(R.string.analytics_action_save))
-                    .setLabel(accountText)
-                    .build());
             Model.getInstance().saveAccountPassword(accountText, passwordText);
         }
     }

@@ -10,10 +10,9 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 
-import com.google.android.gms.analytics.Tracker;
 
 public abstract class BaseFragment extends Fragment {
-    protected Tracker tracker;
+    //protected Tracker tracker;
     private Animation.AnimationListener mAnimationListener;
 
     protected void showAlertMessage(String message) {
@@ -27,7 +26,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+        // tracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
     }
 
     public abstract int getTitleColorId();
