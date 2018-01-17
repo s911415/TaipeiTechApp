@@ -203,7 +203,8 @@ public class CourseTableLayout extends LinearLayout {
         CourseBlock table_cell = (CourseBlock) table_row.getChildAt(col);
         table_cell.setVisibility(View.INVISIBLE);
         table_cell.setText(course.getCourseName());
-        table_cell.setTag(course);
+        table_cell.setTag(R.id.course, course);
+        table_cell.setTag(R.id.week, col);
         table_cell.setBackgroundColor(color);
         table_cell.setOnClickListener(onClickListener);
         setAnimation(table_cell);

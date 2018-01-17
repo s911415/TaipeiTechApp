@@ -5,34 +5,31 @@
               android:background="@drawable/orange_selector"
               android:orientation="horizontal">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:gravity="center"
-        android:orientation="horizontal"
         android:padding="5dp">
 
         <TextView
             android:id="@+id/calendarDate"
-            android:layout_width="0dip"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:gravity="center_vertical|right"
-            android:singleLine="true"
+            android:gravity="center"
+            android:maxLines="1"
             android:textColor="@color/white"
-            android:textSize="@dimen/textMedium"/>
+            android:textSize="@dimen/textLarge"/>
 
         <TextView
-            android:id="@+id/calendarDay"
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="-2dp"
-            android:layout_weight="3"
-            android:gravity="bottom|left"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="@dimen/textSmall"/>
-    </LinearLayout>
+                android:id="@+id/calendarDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_gravity="bottom|right"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textSmall"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/calendarEvent"

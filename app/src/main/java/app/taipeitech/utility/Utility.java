@@ -18,13 +18,12 @@ import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 import app.taipeitech.MainActivity;
 import app.taipeitech.R;
 import app.taipeitech.model.Model;
 import app.taipeitech.model.StudentCourse;
 import app.taipeitech.model.StudentCredit;
+import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -74,7 +73,7 @@ public class Utility {
     }
 
     public static void showActivityNotification(Context context, String title,
-                                                   String message, Bitmap bitmap){
+                                                String message, Bitmap bitmap) {
         if (context == null) {
             return;
         }
@@ -85,10 +84,10 @@ public class Utility {
                 .setSmallIcon(R.drawable.activity_icon)
                 .setLargeIcon(BitmapUtility.loadBitmap(context, R.drawable.ic_app))
                 .setStyle(
-                new NotificationCompat
-                        .BigPictureStyle()
-                        .bigPicture(bitmap)
-                        .setSummaryText(message));
+                        new NotificationCompat
+                                .BigPictureStyle()
+                                .bigPicture(bitmap)
+                                .setSummaryText(message));
         Intent intent = new Intent(context, MainActivity.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -218,8 +217,7 @@ public class Utility {
     public static String getDateString(String format, Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.TAIWAN);
         DateFormatSymbols dfs = new DateFormatSymbols();
-        dfs.setShortWeekdays(new String[]{"", "日", "一", "二", "三", "四", "五",
-                "六"});
+        dfs.setShortWeekdays(new String[]{"", "日", "一", "二", "三", "四", "五", "六"});
         sdf.setDateFormatSymbols(dfs);
         return sdf.format(date);
     }

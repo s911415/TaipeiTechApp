@@ -6,11 +6,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.widget.TextView;
 
+import android.support.v7.widget.AppCompatTextView;
 import app.taipeitech.R;
 
-public class CourseBlock extends TextView {
+public class CourseBlock extends AppCompatTextView {
 
     public CourseBlock(Context context) {
         super(context);

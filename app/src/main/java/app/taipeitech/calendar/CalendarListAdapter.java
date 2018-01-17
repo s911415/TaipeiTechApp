@@ -16,6 +16,7 @@ import app.taipeitech.R;
 import app.taipeitech.model.EventInfo;
 import app.taipeitech.utility.Utility;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,10 +49,11 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
             holder = (ViewHolder) convertView.getTag();
         }
         EventInfo event = getItem(position);
-        holder.date_textview.setText(Utility.getDate(event.getStartDate()));
-        holder.day_textview.setText(Utility.getDateString("E",
-                event.getStartDate()));
+        Date startDate = event.getStartDate();
+        holder.date_textview.setText(Utility.getDate(startDate));
+        holder.day_textview.setText(Utility.getDateString("E", startDate));
         holder.event_textview.setText(event.getEvent());
+
         convertView.setTag(R.id.data_tag, event);
         convertView.setOnClickListener(this);
         return convertView;

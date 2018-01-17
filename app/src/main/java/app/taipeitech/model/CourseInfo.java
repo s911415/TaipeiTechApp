@@ -5,7 +5,7 @@ public class CourseInfo {
     private String courseName = null;
     private String courseTeacher = null;
     private String[] courseTimes = null;
-    private String courseRoom = null;
+    private String[] courseRooms = null;
 
     public String getCourseNo() {
         return courseNo;
@@ -20,7 +20,7 @@ public class CourseInfo {
     }
 
     public void setCourseName(String courseName) {
-        this.courseName = courseName;
+        this.courseName = courseName.trim();
     }
 
     public String getCourseTeacher() {
@@ -28,7 +28,7 @@ public class CourseInfo {
     }
 
     public void setCourseTeacher(String courseTeacher) {
-        this.courseTeacher = courseTeacher;
+        this.courseTeacher = courseTeacher.trim();
     }
 
     public String[] getCourseTimes() {
@@ -39,11 +39,11 @@ public class CourseInfo {
         this.courseTimes = courseTimes;
     }
 
-    public String getCourseRoom() {
-        return courseRoom;
+    public String[] getCourseRooms() {
+        return courseRooms;
     }
 
-    public void setCourseRoom(String courseRoom) {
-        this.courseRoom = courseRoom;
+    public void setCourseRooms(String[] courseRooms) {
+        this.courseRooms = courseRooms;
     }
 }

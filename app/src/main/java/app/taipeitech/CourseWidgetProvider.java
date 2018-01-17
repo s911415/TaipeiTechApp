@@ -164,7 +164,7 @@ public class CourseWidgetProvider extends AppWidgetProvider {
                 }
                 if (!is_have_time) {
                     count++;
-                    isDisplayNoTime = true;
+                    // isDisplayNoTime = true;
                     setTableCell(context, views, count, 8,
                             color_array[color_index], item);
                 }

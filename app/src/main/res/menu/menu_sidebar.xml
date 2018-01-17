@@ -4,6 +4,7 @@
         <item
             android:id="@+id/sidebar_item_activity"
             android:icon="@drawable/activity_icon"
+            android:visible="false"
             android:title="@string/activity_text"/>
         <item
             android:id="@+id/sidebar_item_calendar"

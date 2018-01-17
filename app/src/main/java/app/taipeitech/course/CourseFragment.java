@@ -288,8 +288,9 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
 
     @Override
     public void onClick(View view) {
-        CourseInfo item = (CourseInfo) view.getTag();
-        showInfoDialog(view.getId(), item.getCourseName(), item);
+        CourseInfo item = (CourseInfo) view.getTag(R.id.course);
+        int week = (int) view.getTag(R.id.week);
+        showInfoDialog(view.getId(), week, item.getCourseName(), item);
     }
 
     private void saveStudentCourse() {
@@ -301,13 +302,17 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void showInfoDialog(int id, String courseName, CourseInfo course) {
+    private void showInfoDialog(int id, int week, String courseName, CourseInfo course) {
         selectedCourseNo = course.getCourseNo();
         Builder course_dialog_builder = new AlertDialog.Builder(getActivity());
         course_dialog_builder.setTitle(courseName);
+        String classRoom = "N/A";
+        if (week < 7) {
+            classRoom = course.getCourseRooms()[week];
+        }
         String message = String.format(Locale.TAIWAN,
                 "課號：%s\n時間：%s\n地點：%s\n授課老師：%s", course.getCourseNo(),
-                TIME_ARRAY[id - 1], course.getCourseRoom(),
+                TIME_ARRAY[id - 1], classRoom,
                 course.getCourseTeacher());
         course_dialog_builder.setMessage(message);
         course_dialog_builder.setPositiveButton("詳細內容", courseDetailDialogLis);

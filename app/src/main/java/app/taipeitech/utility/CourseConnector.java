@@ -247,8 +247,10 @@ public class CourseConnector {
         params.put("year", year);
         params.put("sem", semester);
         String result = Connector.getDataByPost(COURSE_URI, params, "big5");
-        TagNode tagNode;
-        tagNode = new HtmlCleaner().clean(result);
+        params.put("format", "-4");
+        String resultTable = Connector.getDataByPost(COURSE_URI, params, "big5");
+        TagNode tagNode = new HtmlCleaner().clean(result);
+        TagNode tagNode2 = new HtmlCleaner().clean(resultTable);
         TagNode[] nodes = tagNode.getElementsByAttValue("border", "1", true,
                 false);
         TagNode[] rows = nodes[0].getElementsByName("tr", true);
@@ -263,17 +265,49 @@ public class CourseConnector {
             }
             course.setCourseName(cols[1].getText().toString());
             course.setCourseTeacher(cols[6].getText().toString());
-            course.setCourseRoom(cols[15].getText().toString());
-            course.setCourseTime(new String[]{cols[8].getText().toString(),
-                    cols[9].getText().toString(),
-                    cols[10].getText().toString(),
-                    cols[11].getText().toString(),
-                    cols[12].getText().toString(),
-                    cols[13].getText().toString(),
-                    cols[14].getText().toString()});
+            course.setCourseTime(new String[]{
+                    cols[8].getText().toString().trim(),
+                    cols[9].getText().toString().trim(),
+                    cols[10].getText().toString().trim(),
+                    cols[11].getText().toString().trim(),
+                    cols[12].getText().toString().trim(),
+                    cols[13].getText().toString().trim(),
+                    cols[14].getText().toString().trim()
+            });
+            updateClassRoom(course, tagNode2);
             courses.add(course);
         }
         return courses;
+    }
+
+    private static void updateClassRoom(CourseInfo course, TagNode tagNode) {
+        final String[] courseTimes = course.getCourseTimes();
+        String[] courseRooms = new String[courseTimes.length];
+        TagNode[] rows = tagNode.getElementsByName("tr", true);
+        final int START_ROW = 2;
+        boolean hasWeekend = rows[1].getAllChildren().size() == 8;
+        for (int i = 0; i < courseTimes.length; i++) {
+            courseRooms[i] = "";
+            if (!hasWeekend && (i == 0 || i == 6)) continue;
+            try {
+                String[] courseTimeArr = courseTimes[i].trim().split("\\s");
+                if (courseTimeArr.length == 0) continue;
+                int firstSection = Integer.parseInt(courseTimeArr[0], 16);
+                int col = hasWeekend ? i + 1 : i;
+                TagNode td = rows[firstSection + START_ROW - 1].getChildTagList().get(col);
+                TagNode[] links = td.getElementsByName("a", false);
+                if (links.length > 0) {
+                    TagNode lastNode = links[links.length - 1];
+                    String href = lastNode.getAttributeByName("href");
+                    if (href != null && href.startsWith("Croom.jsp")) {
+                        courseRooms[i] = lastNode.getText().toString().trim();
+                    }
+                }
+
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        course.setCourseRooms(courseRooms);
     }
 
     public static boolean isLogin() {
