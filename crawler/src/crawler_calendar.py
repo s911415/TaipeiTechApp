@@ -4,7 +4,6 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
-
 def format_date(date_str):
     date_arr = date_str.split("/")
     return '%02d-%02d' % (int(date_arr[0]), int(date_arr[1]))
@@ -17,17 +16,22 @@ def main():
     soup = BeautifulSoup(html.read(), "html.parser")
 
     # 所有 <P> 的清單
-    infoList = soup.findAll({'p'})
+    infoList = soup.findAll({'td'})
 
     for info in infoList:
         # 尋找包含日期的資料
-        for data in re.findall("\(\d*/\d*.*(?=<)|\(\d+/*\d*-*\d+/*\d*\).*(?=<)",
-                               str(info)):
+        for data in re.findall("\(\d*/\d*.*|\(\d+/*\d*-*\d+/*\d*\).*",
+                               info.text):
             try:
                 # 將日期前的'('取代成' ('
                 # 然後用' '或'、 '分割開來加入 dataList
-                dataList += re.split("、\s*(?=\()|(?<=\S)\s+(?=\()",
-                                     re.sub("(?<=\S)\((?=\d*/\d*\))", " (", data))
+                dataMatch = re.split("、\s*(?=\()|(?<=\S)\s+(?=\()",
+                                re.sub("(?<=\S)\((?=\d*/\d*\))", " (", data))
+                for dat in dataMatch:
+                    if isinstance(dat, str):
+                        dat = dat.strip()
+                        if dat not in dataList:
+                            dataList.append(dat)
             except:
                 pass
     # print(dataList)

@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class CalendarConnector {
 
-    private final static String CALENDAR_URI = HttpHelper.SERVER_HOST + "calendar.json";
+    private final static String CALENDAR_URI = "https://raw.githubusercontent.com/kamisakihideyoshi/TaipeiTechRefined/master/crawler/calendar.json";
 
     public static YearCalendar getEventList() throws Exception {
         try {
