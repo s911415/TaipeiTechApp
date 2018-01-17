@@ -11,10 +11,20 @@ public class StudentCredit {
     private ArrayList<SemesterRank> ranks = new ArrayList<SemesterRank>();
 
     public ArrayList<SemesterCredit> getSemesterCredits() {
+        Collections.sort(semesters, new Comparator<SemesterCredit>() {
+            @Override
+            public int compare(SemesterCredit o1, SemesterCredit o2) {
+                return o2.toString().compareTo(o1.toString());
+            }
+        });
         return semesters;
     }
 
     public void addSemesterCredit(SemesterCredit semesterCredit) {
+        for (SemesterCredit sc : this.semesters) {
+            if (sc.toString().equals(semesterCredit.toString()))
+                return;
+        }
         this.semesters.add(semesterCredit);
     }
 

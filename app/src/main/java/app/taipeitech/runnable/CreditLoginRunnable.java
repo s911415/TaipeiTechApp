@@ -13,6 +13,7 @@ public class CreditLoginRunnable extends BaseRunnable {
     public void run() {
         try {
             String result = CreditConnector.loginCredit();
+            CreditConnector.loginSepf();
             sendRefreshMessage(result);
         } catch (Exception e) {
             sendErrorMessage(e.getMessage());

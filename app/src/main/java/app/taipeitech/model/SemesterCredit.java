@@ -73,4 +73,8 @@ public class SemesterCredit {
         this.conduct_score = conduct_score;
     }
 
+    @Override
+    public String toString(){
+        return year + "-" + sem;
+    }
 }
