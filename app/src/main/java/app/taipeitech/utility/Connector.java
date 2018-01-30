@@ -180,7 +180,7 @@ public class Connector {
     private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection, URL url){
         httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
         httpURLConnection.setRequestProperty("Upgrade-Insecure-Requests", "1");
-        httpURLConnection.setRequestProperty("Connection", "close");
+        httpURLConnection.setRequestProperty("Connection", "keep-alive");
 
         return httpURLConnection;
     }
