@@ -1,12 +1,37 @@
 # Reference : https://github.com/kamisakihideyoshi/TaipeiTechRefined
 import re
+import sys
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
+
 def format_date(date_str):
     date_arr = date_str.split("/")
     return '%02d-%02d' % (int(date_arr[0]), int(date_arr[1]))
+
+
+def process_string_to_date(data_str, prev_date=None):
+    if data_str is None:
+        return None
+
+    return_date = ""
+
+    # 如果只有日期的話
+    if re.match("^\d{1,2}$", data_str):
+        if (prev_date is None):
+            sys.stderr.write("Error when parsing: " + data_str)
+        else:
+            return_date = prev_date.split("/")[0] + "/" + data_str
+    # 如果日期是 3 個數字連一起 EX.810，將它分開 (行政人員輸入問題)
+    # 然後將endDate轉型成str
+    elif re.match("\d{3,4}", data_str):
+        return_date = str(int(data_str) // 100) + "/" + str(
+            int(data_str) % 100)
+    else:
+        return_date = data_str
+
+    return return_date
 
 
 def main():
@@ -26,7 +51,7 @@ def main():
                 # 將日期前的'('取代成' ('
                 # 然後用' '或'、 '分割開來加入 dataList
                 dataMatch = re.split("、\s*(?=\()|(?<=\S)\s+(?=\()",
-                                re.sub("(?<=\S)\((?=\d*/\d*\))", " (", data))
+                                     re.sub("(?<=\S)\((?=\d*/\d*\))", " (", data))
                 for dat in dataMatch:
                     if isinstance(dat, str):
                         dat = dat.strip()
@@ -51,26 +76,12 @@ def main():
     # 找出開始與結束日期
     for data in dataList:
         startDate = re.search("(\d+/*\d+)", data)
-        endDate = re.search("(?<=\-)\d*/\d*", data)
+        endDate = re.search("(?<=-)\d*((/\d*)?)", data)
 
         # 如果日期是3個數字連一起 EX.810，將它分開 (行政人員輸入問題)
         # 然後將 startDate 轉型成 str
-        if re.match("\d{3,4}", startDate.group()):
-            startDate = str(int(startDate.group()) // 100) + "/" + str(
-                int(startDate.group()) % 100)
-        else:
-            startDate = startDate.group()
-
-        # 有 endDate 的話
-        if endDate is not None:
-
-            # 如果日期是 3 個數字連一起 EX.810，將它分開 (行政人員輸入問題)
-            # 然後將endDate轉型成str
-            if re.match("\d{3,4}", endDate.group()):
-                endDate = str(int(endDate.group()) // 100) + "/" + str(
-                    int(endDate.group()) % 100)
-            else:
-                endDate = endDate.group()
+        startDate = process_string_to_date(startDate.group())
+        endDate = process_string_to_date(None if endDate is None else endDate.group(), startDate)
 
         # 找出內文的部分
         event = re.search("\d*[\u4e00-\u9fa5]+.*", data)
