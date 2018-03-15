@@ -28,9 +28,9 @@ public class MainApplication extends Application {
         AnalyticsTrackers.initialize(this);
         singleton = this;
         Model.getInstance();
-        Intent check_intent = new Intent(this, ActivityCheckReceiver.class);
-        check_intent.putExtra("action", "app.taipeitech.action.ACTIVITY_CHECK");
-        sendBroadcast(check_intent);
+        //Intent check_intent = new Intent(this, ActivityCheckReceiver.class);
+        //check_intent.putExtra("action", "app.taipeitech.action.ACTIVITY_CHECK");
+        //sendBroadcast(check_intent);
     }
 
     private static byte[] _key = null;

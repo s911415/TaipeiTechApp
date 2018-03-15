@@ -74,7 +74,8 @@ public class ActivityFragment extends BaseFragment implements
 
     private void setData() {
         View start_button = fragmentView.findViewById(R.id.start_button);
-        ActivityList activity_list = Model.getInstance().getActivityArray();
+
+        ActivityList activity_list = null;
         if (activity_list != null) {
             start_button.setVisibility(View.GONE);
             listView.setAdapter(new ActivityItemAdapter(getActivity(),
@@ -102,6 +103,7 @@ public class ActivityFragment extends BaseFragment implements
         }
     }
 
+    /*
     private void obtainActivityResult(ActivityList result) {
         if (result != null) {
             ActivityItemView.clearImageCache();
@@ -120,6 +122,7 @@ public class ActivityFragment extends BaseFragment implements
             showAlertMessage("此服務發生錯誤，請稍後再試！");
         }
     }
+    */
 
     @Override
     public int getTitleColorId() {
@@ -133,6 +136,7 @@ public class ActivityFragment extends BaseFragment implements
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_activity, menu);
     }
 
@@ -168,7 +172,7 @@ public class ActivityFragment extends BaseFragment implements
                         ActivityList result = (ActivityList) msg.obj;
                         ActivityFragment fragment = fragmentRef.get();
                         if (fragment != null) {
-                            fragment.obtainActivityResult(result);
+                            //fragment.obtainActivityResult(result);
                         }
                     }
                     break;

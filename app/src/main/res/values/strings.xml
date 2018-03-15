@@ -93,6 +93,13 @@
     <string name="account_empty_error_message">請填入學號</string>
     <string name="password_empty_error_message">請填入密碼</string>
 
+    <!-- Class -->
+    <string name="classroom_text">教室查詢</string>
+    <string name="building">大樓</string>
+    <string name="classroom_input_text">教室</string>
+    <string name="classroom_refresh">更新教室清單</string>
+
+
     <!-- Analytics -->
     <string name="analytics_category_activity">Activity Fragment</string>
     <string name="analytics_category_calendar">Calendar Fragment</string>

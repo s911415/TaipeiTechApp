@@ -1,7 +1,9 @@
 package app.taipeitech.model;
 
-import com.google.gson.Gson;
+import android.support.annotation.Nullable;
 import app.taipeitech.MainApplication;
+import app.taipeitech.course.data.Semester;
+import com.google.gson.Gson;
 
 public class Model {
     private static final String ACCOUNT_NAME = "account";
@@ -10,11 +12,13 @@ public class Model {
     private static final String STUDENT_CREDIT_NAME = "studentCredit";
     private static final String STANDARD_CREDIT_NAME = "standardCredit";
     private static final String YEAR_CALENDAR_NAME = "yearCalendar";
+    private static final String CLASSROOMS_NAME = "classroomList";
     private static final String ACTIVITY_ARRAY_NAME = "activityArray";
     private volatile static Model instance = null;
     private StudentCourse studentCourse = null;
     private StudentCredit studentCredit = null;
     private StandardCredit standardCredit = null;
+    private ClassroomsInfo classroomsInfo = null;
     private YearCalendar yearCalendar = null;
     private ActivityList activityArray = null;
 
@@ -41,6 +45,7 @@ public class Model {
         standardCredit = readObjectSetting(STANDARD_CREDIT_NAME,
                 StandardCredit.class);
         yearCalendar = readObjectSetting(YEAR_CALENDAR_NAME, YearCalendar.class);
+        classroomsInfo = readObjectSetting(CLASSROOMS_NAME, ClassroomsInfo.class);
         activityArray = readObjectSetting(ACTIVITY_ARRAY_NAME,
                 ActivityList.class);
     }
@@ -116,6 +121,27 @@ public class Model {
         return studentCourse;
     }
 
+    @Nullable
+    public ClassroomsInfo getClassroomsInfo(Semester sem) {
+        if (classroomsInfo != null) {
+            if (classroomsInfo.sem.equals(sem)) {
+                return classroomsInfo;
+            }
+        }
+
+        return null;
+    }
+
+    public void saveClassroomsInfo(ClassroomsInfo info) {
+        saveObjectSetting(CLASSROOMS_NAME, info);
+        this.classroomsInfo = info;
+    }
+
+    public void deleteClassroomsInfo() {
+        MainApplication.clearSettings(CLASSROOMS_NAME);
+        this.classroomsInfo = null;
+    }
+
     public void setStudentCourse(StudentCourse studentCourse) {
         this.studentCourse = studentCourse;
     }
@@ -140,7 +166,7 @@ public class Model {
     public void saveYearCalendar() {
         saveObjectSetting(YEAR_CALENDAR_NAME, yearCalendar);
     }
-
+/*
     public ActivityList getActivityArray() {
         if (activityArray != null) {
             activityArray.checkActivity();
@@ -159,4 +185,5 @@ public class Model {
     public void saveActivityArray() {
         saveObjectSetting(ACTIVITY_ARRAY_NAME, activityArray);
     }
+    */
 }

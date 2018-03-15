@@ -1,20 +1,23 @@
 package app.taipeitech.utility;
 
+import android.net.Uri;
 import android.text.TextUtils;
+import app.taipeitech.classroom.data.Building;
+import app.taipeitech.classroom.data.Classroom;
 import app.taipeitech.course.data.Semester;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.StudentCourse;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class CourseConnector {
     private static boolean isLogin = false;
     private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSES_URI = "http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Select.jsp";
+    private static final String CLASSROOM_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp?format=-2&year=%s&sem=%s";
 
     public static String loginCourse() throws Exception {
         try {
@@ -309,6 +312,34 @@ public class CourseConnector {
         }
         course.setCourseRooms(courseRooms);
     }
+
+
+    public static List<Classroom> getClassrooms(String year, String semester) throws Exception {
+        List<Classroom> ret = new ArrayList<>();
+        String result = Connector.getDataByGet(String.format(CLASSROOM_URI, year, semester), "big5");
+        TagNode tagNode = new HtmlCleaner().clean(result);
+        TagNode[] nodes = tagNode.getElementsByName("tr", true);
+        for (TagNode tr : nodes) {
+            TagNode[] cells = tr.getAllElements(false);
+            if (cells.length == 9) {
+                TagNode[] childElems = cells[0].getAllElements(false);
+                if (childElems.length > 0) {
+                    final TagNode firstNode = childElems[0];
+                    String href = firstNode.getAttributeByName("href");
+                    if (firstNode.getName().equals("a") && href != null && href.startsWith("Croom.jsp")) {
+                        Uri uri = Uri.parse(href);
+                        String code = uri.getQueryParameter("code");
+                        if (code != null && !code.isEmpty()) {
+                            ret.add(new Classroom(code, Utility.cleanString(firstNode.getText().toString())));
+                        }
+                    }
+                }
+            }
+        }
+        Collections.sort(ret, Classroom.comparator);
+        return ret;
+    }
+
 
     public static boolean isLogin() {
         return isLogin;

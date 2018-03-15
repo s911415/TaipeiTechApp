@@ -3,6 +3,7 @@ package app.taipeitech.course;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by Alan on 2015/10/17.
  */
-public class SemesterSelector extends Button implements View.OnClickListener {
+public class SemesterSelector extends AppCompatButton implements View.OnClickListener {
     private OnSemesterSelectedListener mOnSemesterSelectedListener;
     private ArrayList<Semester> mSemesterList = new ArrayList<>();
     private String[] mSemesterArray;

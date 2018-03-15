@@ -1,0 +1,62 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:id="@+id/main_layout"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:clickable="true"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+            <app.taipeitech.classroom.BuildingSelector
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:id="@+id/building"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:prompt="@string/building"
+                    android:textSize="@dimen/textMedium"/>
+
+            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="10dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/course_icon"/>
+
+            <app.taipeitech.classroom.component.ClassroomSpinner
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:id="@+id/classroomSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:padding="3dp"
+                    android:singleLine="true"
+                    android:textColor="@color/darken"
+                    android:textSize="@dimen/textMedium"/>
+        </LinearLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/cloud"/>
+
+        <app.taipeitech.course.CourseTableLayout
+                android:id="@+id/courseTable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"/>
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

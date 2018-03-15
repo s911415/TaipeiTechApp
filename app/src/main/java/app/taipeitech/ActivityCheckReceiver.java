@@ -75,6 +75,8 @@ public class ActivityCheckReceiver extends BroadcastReceiver {
 
         @Override
         protected HashMap<ActivityInfo, Bitmap> doInBackground(Void... params) {
+            return null;
+            /*
 //            if (WifiUtility.isWifiOpen(context) && WifiUtility.isNetworkAvailable(context)) {
 //                try {
 //                    ActivityList activityList = ActivityConnector.getActivityList(context);
@@ -118,7 +120,7 @@ public class ActivityCheckReceiver extends BroadcastReceiver {
                     result.put(activity, bitmap);
                 }
             }
-            return result;
+            return result;*/
         }
 
         @Override

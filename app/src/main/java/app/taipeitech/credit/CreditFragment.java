@@ -426,6 +426,7 @@ public class CreditFragment extends BaseFragment implements OnClickListener,
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_credit, menu);
     }
 

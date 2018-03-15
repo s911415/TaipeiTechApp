@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 import app.taipeitech.MainActivity;
 import app.taipeitech.R;
+import app.taipeitech.course.data.Semester;
 import app.taipeitech.model.Model;
 import app.taipeitech.model.StudentCourse;
 import app.taipeitech.model.StudentCredit;
@@ -244,5 +245,19 @@ public class Utility {
             return false;
         }
         return true;
+    }
+
+    public static Semester getCurrentSemesterInfo() {
+        Calendar calendar = Calendar.getInstance();
+        final int month = calendar.get(Calendar.MONTH) + 1;
+        final int rocYear = calendar.get(Calendar.YEAR);
+        int year = rocYear - 1911;
+        int sem = 1;
+        if (month < 8) {
+            year--;
+            sem = 2;
+        }
+
+        return new Semester(year, sem);
     }
 }
