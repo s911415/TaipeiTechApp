@@ -1,7 +1,6 @@
 package app.taipeitech.classroom.data;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Building {
@@ -20,9 +19,7 @@ public class Building {
         _classRooms.add(c);
     }
 
-    public List<Classroom> getClassrooms(){
-        List<Classroom> tmp = new LinkedList<>();
-        tmp.addAll(_classRooms);
-        return tmp;
+    public List<Classroom> getClassrooms() {
+        return _classRooms;
     }
 }

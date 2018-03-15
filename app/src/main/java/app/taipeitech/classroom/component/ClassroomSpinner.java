@@ -53,6 +53,7 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
 
     public void setDataSet(List<Classroom> data) {
         _dataset.clear();
+        this.setSelection(0);
         _dataset.addAll(data);
         _arrayAdapter = (ClassroomAdapter) getAdapter();
         if (_arrayAdapter == null) {

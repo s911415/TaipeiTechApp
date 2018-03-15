@@ -38,6 +38,7 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
     private BuildingSelector mBuildingSelector;
     private static View fragmentView;
     private boolean needShowSemesterDialog = true;
+    private final static String ALL_TEXT = "[全部]";
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -125,7 +126,7 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
 
     private LinkedHashMap<String, Building> getBuildingList(List<Classroom> classrooms) {
         LinkedHashMap<String, Building> ret = new LinkedHashMap<>();
-        Building _all = new Building("[全部]");
+        Building _all = new Building(ALL_TEXT);
         ret.put(_all.getBuildingName(), _all);
 
         for (final Classroom c : classrooms) {
@@ -147,6 +148,7 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
         LinkedList<Building> list = new LinkedList<>();
         list.addAll(buildingLinkedHashMap.values());
         mBuildingSelector.setBuildingList(list);
+        mBuildingSelector.setText(buildingLinkedHashMap.get(ALL_TEXT));
     }
 
     public DialogInterface.OnClickListener courseDetailDialogLis = new DialogInterface.OnClickListener() {
