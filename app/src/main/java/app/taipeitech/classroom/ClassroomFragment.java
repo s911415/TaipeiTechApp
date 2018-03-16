@@ -53,7 +53,15 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener, 
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 2:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    if (currentBuilding != null) {
+                        mBuildingSelector.setText(currentBuilding);
+                        classroomSpinner.setDataSet(currentBuilding.getClassrooms());
+
+                        if (classroom != null) {
+                            classroomSpinner.setSelection(currentBuilding.getClassrooms().indexOf(classroom));
+                        }
+                    }
 
                 }
                 break;
@@ -169,6 +177,7 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener, 
         mBuildingSelector.setBuildingList(list);
         Building b = buildingLinkedHashMap.get(ALL_TEXT);
         mBuildingSelector.setText(b);
+        currentBuilding = b;
         classroomSpinner.setDataSet(b.getClassrooms());
     }
 

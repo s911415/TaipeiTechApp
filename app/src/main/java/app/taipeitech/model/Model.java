@@ -51,10 +51,14 @@ public class Model {
     }
 
     private <T> T readObjectSetting(String type_string, Class<T> classOfT) {
-        Gson gson = new Gson();
-        String json = MainApplication.readSetting(type_string);
-        if (json != null && json.length() > 0) {
-            return gson.fromJson(json, classOfT);
+        try {
+            Gson gson = new Gson();
+            String json = MainApplication.readSetting(type_string);
+            if (json != null && json.length() > 0) {
+                return gson.fromJson(json, classOfT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
