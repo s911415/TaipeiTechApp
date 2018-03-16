@@ -1,7 +1,6 @@
 package app.taipeitech.classroom;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
@@ -14,6 +13,7 @@ import app.taipeitech.classroom.component.ClassroomListDialog;
 import app.taipeitech.classroom.component.ClassroomSpinner;
 import app.taipeitech.classroom.data.Building;
 import app.taipeitech.classroom.data.Classroom;
+import app.taipeitech.classroom.task.FetchClassroomUsageTask;
 import app.taipeitech.classroom.task.SearchClassroomTask;
 import app.taipeitech.course.CourseTableLayout;
 import app.taipeitech.course.CourseTableLayout.TableInitializeListener;
@@ -21,6 +21,7 @@ import app.taipeitech.course.data.Semester;
 import app.taipeitech.model.ClassroomsInfo;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.Model;
+import app.taipeitech.model.StudentCourse;
 import app.taipeitech.utility.Utility;
 import app.taipeitech.utility.WifiUtility;
 
@@ -39,6 +40,7 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
     private static View fragmentView;
     private boolean needShowSemesterDialog = true;
     private final static String ALL_TEXT = "[全部]";
+    private final Semester curSem = Utility.getCurrentSemesterInfo();
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -83,14 +85,13 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
 
 
     private void fetchBuildingTable() {
-        Semester cur = Utility.getCurrentSemesterInfo();
-        ClassroomsInfo savedInfo = Model.getInstance().getClassroomsInfo(cur);
+        ClassroomsInfo savedInfo = Model.getInstance().getClassroomsInfo(curSem);
         if (savedInfo == null) {
             if (WifiUtility.isNetworkAvailable(getActivity())) {
                 closeSoftKeyboard();
                 if (Utility.checkAccount(getActivity())) {
                     SearchClassroomTask searchCourseTask = new SearchClassroomTask(this);
-                    searchCourseTask.execute(cur.getYear(), cur.getSemester());
+                    searchCourseTask.execute(curSem.getYear(), curSem.getSemester());
                 }
             } else {
                 Toast.makeText(getActivity(), R.string.check_network_available,
@@ -120,6 +121,19 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
     }
 
     private void showCourseTable() {
+        if (classroom == null) {
+            Toast.makeText(getActivity(), R.string.no_classroom_selected,
+                    Toast.LENGTH_LONG).show();
+        } else if (WifiUtility.isNetworkAvailable(getActivity())) {
+            closeSoftKeyboard();
+            if (Utility.checkAccount(getActivity())) {
+                FetchClassroomUsageTask task = new FetchClassroomUsageTask(this);
+                task.execute(curSem.getYear(), curSem.getSemester(), String.valueOf(classroom.getCode()));
+            }
+        } else {
+            Toast.makeText(getActivity(), R.string.check_network_available,
+                    Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -148,16 +162,10 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
         LinkedList<Building> list = new LinkedList<>();
         list.addAll(buildingLinkedHashMap.values());
         mBuildingSelector.setBuildingList(list);
-        mBuildingSelector.setText(buildingLinkedHashMap.get(ALL_TEXT));
+        Building b = buildingLinkedHashMap.get(ALL_TEXT);
+        mBuildingSelector.setText(b);
+        classroomSpinner.setDataSet(b.getClassrooms());
     }
-
-    public DialogInterface.OnClickListener courseDetailDialogLis = new DialogInterface.OnClickListener() {
-
-        @Override
-        public void onClick(DialogInterface arg0, int arg1) {
-
-        }
-    };
 
     private BuildingSelector.OnBuildingSelectedListener buildingSelectedLis = new BuildingSelector.OnBuildingSelectedListener() {
         @Override
@@ -167,10 +175,22 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
         }
     };
 
-    private ClassroomListDialog.SearchableItem onClassroomSelected = new ClassroomListDialog.SearchableItem() {
+
+    public void obtainCourseList(Object object) {
+        if (object instanceof StudentCourse) {
+            StudentCourse result = (StudentCourse) object;
+            showCourse(result);
+        }
+    }
+
+    private void showCourse(StudentCourse studentCourse) {
+        courseTable.showCourse(studentCourse);
+    }
+
+    private ClassroomListDialog.SearchableItem<Classroom> onClassroomSelected = new ClassroomListDialog.SearchableItem<Classroom>() {
         @Override
-        public void onSearchableItemClicked(Object item, int position) {
-            classroom = (Classroom) item;
+        public void onSearchableItemClicked(Classroom item, int position) {
+            classroom = item;
             showCourseTable();
         }
     };

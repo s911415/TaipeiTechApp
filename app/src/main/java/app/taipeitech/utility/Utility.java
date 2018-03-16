@@ -28,10 +28,7 @@ import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 public class Utility {
     private static int notification_index = 1;
@@ -259,5 +256,22 @@ public class Utility {
         }
 
         return new Semester(year, sem);
+    }
+
+    public static <T> boolean isArrayAreSame(T[] arr1, T[] arr2) {
+        return Arrays.equals(arr1, arr2);
+        /*
+        if (arr1 == null || arr2 == null)
+            return false;
+
+        if (arr1.length != arr2.length)
+            return false;
+
+        for (int i = 0; i < arr1.length; i++) {
+            if (!arr1[i].equals(arr2[i])) return false;
+        }
+
+        return true;
+        */
     }
 }

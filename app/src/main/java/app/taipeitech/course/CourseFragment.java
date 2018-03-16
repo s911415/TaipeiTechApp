@@ -248,7 +248,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
         }
     }
 
-
     public DialogInterface.OnClickListener courseDetailDialogLis = new DialogInterface.OnClickListener() {
 
         @Override

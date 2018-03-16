@@ -12,18 +12,16 @@ import app.taipeitech.classroom.data.Classroom;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchListener, ClassroomListDialog.SearchableItem {
+public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchListener, ClassroomListDialog.SearchableItem<Classroom> {
 
     public static final int NO_ITEM_SELECTED = -1;
-    //this string above will store the value of selected item.
-    String selectedItem;
     private Context _context;
     private List<Classroom> _items, _dataset;
     private ClassroomListDialog _searchableListDialog;
 
     private boolean _isDirty;
     private ClassroomAdapter _arrayAdapter;
-    private ClassroomListDialog.SearchableItem _selected = null;
+    private ClassroomListDialog.SearchableItem<Classroom> _selected = null;
 
     public ClassroomSpinner(Context context) {
         super(context);
@@ -60,10 +58,9 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
             ClassroomAdapter arrayAdapter = new ClassroomAdapter(_context, android.R.layout.simple_list_item_1, _dataset);
             setAdapter(arrayAdapter);
             _arrayAdapter = arrayAdapter;
-        } else {
-            _arrayAdapter.notifyDataSetChanged();
         }
 
+        _arrayAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -85,13 +82,14 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
 
     //The method just below is executed  when an item in the searchlist is tapped.This is where we store the value int string called selectedItem.
     @Override
-    public void onSearchableItemClicked(Object item, int position) {
-        setSelection(_items.indexOf((Classroom) item));
+    public void onSearchableItemClicked(Classroom item, int position) {
+        final int idx = _items.indexOf(item);
+        setSelection(idx);
 
         if (!_isDirty) {
             _isDirty = true;
             setAdapter(_arrayAdapter);
-            setSelection(_items.indexOf((Classroom) item));
+            setSelection(idx);
         }
 
         if (_selected != null) {
@@ -99,7 +97,7 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
         }
     }
 
-    public void setOnItemSelected(ClassroomListDialog.SearchableItem c) {
+    public void setOnItemSelected(ClassroomListDialog.SearchableItem<Classroom> c) {
         this._selected = c;
     }
 
@@ -121,7 +119,7 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
     }
 
     @Override
-    public Object getSelectedItem() {
-        return super.getSelectedItem();
+    public Classroom getSelectedItem() {
+        return (Classroom) super.getSelectedItem();
     }
 }

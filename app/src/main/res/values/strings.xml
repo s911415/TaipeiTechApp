@@ -98,6 +98,7 @@
     <string name="building">大樓</string>
     <string name="classroom_input_text">教室</string>
     <string name="classroom_refresh">更新教室清單</string>
+    <string name="no_classroom_selected">請選擇一個教室</string>
 
 
     <!-- Analytics -->

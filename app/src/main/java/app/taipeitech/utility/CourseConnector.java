@@ -2,22 +2,24 @@ package app.taipeitech.utility;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import app.taipeitech.classroom.data.Building;
 import app.taipeitech.classroom.data.Classroom;
 import app.taipeitech.course.data.Semester;
+import app.taipeitech.model.CourseCollectionInfo;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.StudentCourse;
-import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.TagNode;
+import org.htmlcleaner.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CourseConnector {
     private static boolean isLogin = false;
     private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSES_URI = "http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Select.jsp";
-    private static final String CLASSROOM_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp?format=-2&year=%s&sem=%s";
+    private static final String CLASSROOM_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp";
+    private static final String CLASSROOM_COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp";
 
     public static String loginCourse() throws Exception {
         try {
@@ -316,7 +318,11 @@ public class CourseConnector {
 
     public static List<Classroom> getClassrooms(String year, String semester) throws Exception {
         List<Classroom> ret = new ArrayList<>();
-        String result = Connector.getDataByGet(String.format(CLASSROOM_URI, year, semester), "big5");
+        HashMap<String, String> params = new HashMap<>();
+        params.put("format", "-2");
+        params.put("year", year);
+        params.put("sem", semester);
+        String result = Connector.getDataByPost(CLASSROOM_URI, params, "big5");
         TagNode tagNode = new HtmlCleaner().clean(result);
         TagNode[] nodes = tagNode.getElementsByName("tr", true);
         for (TagNode tr : nodes) {
@@ -338,6 +344,123 @@ public class CourseConnector {
         }
         Collections.sort(ret, Classroom.comparator);
         return ret;
+    }
+
+    public static StudentCourse getClassroomCourses(String year, String semester, String code) throws Exception {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("format", "-3");
+        params.put("year", year);
+        params.put("sem", semester);
+        params.put("code", code);
+        String result = Connector.getDataByPost(CLASSROOM_COURSE_URI, params, "big5");
+        final TagNode tagNode = new HtmlCleaner().clean(result);
+        TagNode[] tables = tagNode.getElementsByName("table", true);
+        if (tables.length == 2) {
+            final TagNode coursesTable = tables[1];
+            final TagNode[] rows = coursesTable.getElementsByName("tr", true);
+            final TagNode[][] courseTableArray = new TagNode[13][7];
+            HashMap<String, CourseInfo> courseMap = new HashMap<>();
+            ArrayList<HtmlNode> _tmpNodes = new ArrayList<>();
+            Pattern sectionNoPattern = Pattern.compile("^\\(([0-9A-Za-z]+)\\)");
+            int rowIdx = 0;
+            for (final TagNode row : rows) {
+                final TagNode[] cells = row.getAllElements(false);
+                if (cells.length == 0 || !"center".equals(cells[0].getAttributeByName("align"))) continue;
+
+                if (cells.length == 8) {// From Sun to Sat
+                    System.arraycopy(cells, 1, courseTableArray[rowIdx], 0, 7);
+                    rowIdx++;
+
+                } else if (cells.length == 6) { // From Mon to Fri
+                    System.arraycopy(cells, 1, courseTableArray[rowIdx], 1, 5);
+                    rowIdx++;
+                }
+
+                for (int week = 0; week < 7; week++) {
+                    for (int section = 0; section < 13; section++) {
+                        TagNode cell = courseTableArray[section][week];
+                        if (cell == null) continue;
+                        _tmpNodes.clear();
+
+                        for (BaseToken baseToken : cell.getAllChildren()) {
+                            if (baseToken instanceof TagNode) {
+                                final String tagName = ((TagNode) baseToken).getName();
+
+                                if (!tagName.equals("br")) {
+                                    _tmpNodes.add((TagNode) baseToken);
+                                }
+                            } else if (baseToken instanceof ContentNode) {
+                                if (!((ContentNode) baseToken).getContent().trim().isEmpty()) {
+                                    _tmpNodes.add((ContentNode) baseToken);
+                                }
+                            }
+                        }
+
+                        if (week == 2 && section == 4) {
+                            section *= 1;
+                        }
+
+                        for (int j = 0, k = _tmpNodes.size(); j < k; j++) {
+                            final HtmlNode node = _tmpNodes.get(j);
+                            if (node instanceof TagNode) {
+                                final TagNode tNode = (TagNode) node;
+                                if (tNode.getAttributeByName("href").startsWith("Curr.jsp") && _tmpNodes.get(j - 1) instanceof ContentNode) {
+                                    ContentNode contentNode = (ContentNode) _tmpNodes.get(j - 1);
+                                    Matcher m = sectionNoPattern.matcher(contentNode.getContent().trim());
+                                    if (m.find()) {
+                                        String sectionNo = m.group(1);
+                                        CourseInfo cInfo = courseMap.get(sectionNo);
+                                        String[] courseTime = null;
+                                        if (cInfo == null) {
+                                            cInfo = new CourseInfo();
+                                            courseMap.put(sectionNo, cInfo);
+                                            cInfo.setCourseNo(sectionNo);
+                                            cInfo.setCourseName(tNode.getText().toString().trim());
+                                            courseTime = new String[7];
+                                            for (int u = 0; u < courseTime.length; u++) {
+                                                courseTime[u] = "";
+                                            }
+                                            cInfo.setCourseTime(courseTime);
+                                        } else {
+                                            courseTime = cInfo.getCourseTimes();
+                                        }
+                                        HashSet<String> tmpSet = new HashSet<>(Arrays.asList(courseTime[week].split(" ")));
+                                        tmpSet.add(String.valueOf(section + 1));
+                                        courseTime[week] = TextUtils.join(" ", tmpSet);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ArrayList<CourseInfo> tmpRet = new ArrayList<>(courseMap.values());
+            ArrayList<CourseInfo> ret = new ArrayList<>();
+            for (int i = 0, k = tmpRet.size(); i < k - 1; i++) {
+                CourseCollectionInfo collectionInfo = new CourseCollectionInfo();
+                final CourseInfo iCourse = tmpRet.get(i);
+                collectionInfo.addCourseInfo(iCourse);
+                for (int j = i + 1; j < k; j++) {
+                    final CourseInfo jCourse = tmpRet.get(j);
+                    if (Utility.isArrayAreSame(iCourse.getCourseTimes(), jCourse.getCourseTimes())) {
+                        collectionInfo.addCourseInfo(jCourse);
+                    }
+                }
+
+                ret.add(collectionInfo);
+            }
+
+
+            StudentCourse student = new StudentCourse();
+            student.setSid("0");
+            student.setYear(year);
+            student.setSemester(semester);
+            student.setCourseList(ret);
+            return student;
+        } else {
+            throw new Exception("Format changed");
+        }
     }
 
 
