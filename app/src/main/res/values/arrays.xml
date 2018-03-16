@@ -3,12 +3,12 @@
 
     <string-array name="credit_type">
         <item>略</item>
-        <item>○</item>
-        <item>△</item>
-        <item>☆</item>
-        <item>●</item>
-        <item>▲</item>
-        <item>★</item>
+        <item>○ 必(部)</item>
+        <item>△ 必(校)</item>
+        <item>☆ 選(共)</item>
+        <item>● 必(專, 部)</item>
+        <item>▲ 必(校, 部)</item>
+        <item>★ 選(專)</item>
     </string-array>
     <string-array name="rank_type">
         <item>班級排名</item>

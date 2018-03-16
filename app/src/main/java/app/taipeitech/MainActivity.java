@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -31,13 +32,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import app.taipeitech.activity.ActivityFragment;
 import app.taipeitech.calendar.CalendarFragment;
+import app.taipeitech.classroom.ClassroomFragment;
 import app.taipeitech.course.CourseFragment;
 import app.taipeitech.credit.CreditFragment;
 import app.taipeitech.setting.AccountSettingFragment;
 import app.taipeitech.utility.PermissionRequestListener;
-import app.taipeitech.wifi.WifiFragment;
 
 /**
  * Created by Alan on 2015/9/12.
@@ -48,10 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private CourseFragment courseFragment = new CourseFragment();
     private CreditFragment creditFragment = new CreditFragment();
-    private WifiFragment wifiFragment = new WifiFragment();
+    private ClassroomFragment classroomFragment = new ClassroomFragment();
+    //private WifiFragment wifiFragment = new WifiFragment();
     private CalendarFragment calendarFragment = new CalendarFragment();
     private AccountSettingFragment accountSettingFragment = new AccountSettingFragment();
-    private ActivityFragment activityFragment = new ActivityFragment();
+    //private ActivityFragment activityFragment = new ActivityFragment();
     private BaseFragment currentFragment;
     private Boolean lockFinish = true;
 
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(first_func)) {
             switchFragment(Integer.parseInt(first_func));
         } else {
-            switchFragment(2);
+            switchFragment(R.id.sidebar_item_course);
         }
     }
 
@@ -77,29 +78,7 @@ public class MainActivity extends AppCompatActivity {
         mSideBar.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.sidebar_item_activity:
-                        switchFragment(0);
-                        break;
-                    case R.id.sidebar_item_calendar:
-                        switchFragment(1);
-                        break;
-                    case R.id.sidebar_item_course:
-                        switchFragment(2);
-                        break;
-                    case R.id.sidebar_item_credit:
-                        switchFragment(3);
-                        break;
-                    case R.id.sidebar_item_wifi:
-                        switchFragment(4);
-                        break;
-                    case R.id.sidebar_item_account_setting:
-                        switchFragment(5);
-                        break;
-                    default:
-                        return false;
-                }
-                return true;
+                return switchFragment(menuItem.getItemId());
             }
         });
 
@@ -135,39 +114,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void switchFragment(int index) {
+
+    private boolean switchFragment(@IdRes int index) {
         switch (index) {
-            case 0:
+           /* case  R.id.sidebar_item_activity:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_activity_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_activity_selector));
                 changeFragment(activityFragment);
-                break;
-            case 1:
+                break;*/
+            case R.id.sidebar_item_calendar:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_calendar_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_calendar_selector));
                 changeFragment(calendarFragment);
                 break;
-            case 2:
+            case R.id.sidebar_item_course:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_course_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_course_selector));
                 changeFragment(courseFragment);
                 break;
-            case 3:
+            case R.id.sidebar_item_credit:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_credit_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_credit_selector));
                 changeFragment(creditFragment);
                 break;
-            case 4:
+            /*case R.id.sidebar_item_wifi:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_wifi_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_wifi_selector));
                 changeFragment(wifiFragment);
-                break;
-            case 5:
+                break;*/
+            case R.id.sidebar_item_account_setting:
                 mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_account_selector));
                 mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_account_selector));
                 changeFragment(accountSettingFragment);
                 break;
+            case R.id.sidebar_item_classroom:
+                mSideBar.setItemIconTintList(getResources().getColorStateList(R.color.sidebar_classroom_selector));
+                mSideBar.setItemTextColor(getResources().getColorStateList(R.color.sidebar_classroom_selector));
+                changeFragment(classroomFragment);
+                break;
+            default:
+                return false;
         }
+
+        return true;
     }
 
     private void changeFragment(BaseFragment to) {

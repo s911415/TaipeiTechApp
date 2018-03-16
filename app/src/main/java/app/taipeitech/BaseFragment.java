@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
@@ -54,6 +56,11 @@ public abstract class BaseFragment extends Fragment {
         AnimationSet animationSet = new AnimationSet(false);
         animationSet.addAnimation(animation);
         return animationSet;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
     }
 
     public void setAnimationListener(Animation.AnimationListener listener) {
