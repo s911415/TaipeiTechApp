@@ -15,7 +15,7 @@ import app.taipeitech.model.StudentCourse;
 import app.taipeitech.utility.Constants;
 import app.taipeitech.utility.Utility;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class CourseWidgetProvider extends AppWidgetProvider {
     private static final int TABLE_COL = 9;
@@ -141,11 +141,10 @@ public class CourseWidgetProvider extends AppWidgetProvider {
             for (CourseInfo item : studentCourse.getCourseList()) {
                 Boolean is_have_time = false;
                 for (int i = 0; i < 7; i++) {
-                    String time = item.getCourseTimes()[i];
-                    ArrayList<String> s = Utility.splitTime(time);
-                    for (String t : s) {
+                    HashSet<String> times = item.getCourseTimes().get(i);
+                    for (String t : times) {
                         if (t.length() != 0) {
-                            int row = Integer.valueOf(t);
+                            int row = Utility.convertTime(t);
                             int col = i == 0 ? 7 : i;
                             if (!isDisplayABCD) {
                                 isDisplayABCD = row > 9;

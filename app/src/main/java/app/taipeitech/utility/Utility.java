@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.SparseArray;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -28,7 +29,10 @@ import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Utility {
     private static int notification_index = 1;
@@ -164,23 +168,28 @@ public class Utility {
         return s;
     }
 
-    public static ArrayList<String> splitTime(String timeString) {
-        ArrayList<String> infos = new ArrayList<>();
+    public static ArrayList<Integer> splitTime(String timeString) {
+        ArrayList<Integer> infos = new ArrayList<>();
         String[] temp = timeString.split(" ");
         for (String t : temp) {
-            if (t.equals("A")) {
-                infos.add("10");
-            } else if (t.equals("B")) {
-                infos.add("11");
-            } else if (t.equals("C")) {
-                infos.add("12");
-            } else if (t.equals("D")) {
-                infos.add("13");
-            } else {
-                infos.add(t);
-            }
+            infos.add(convertTime(t));
         }
         return infos;
+    }
+
+    public static int convertTime(String t){
+        switch (t) {
+            case "A":
+                return 10;
+            case "B":
+                return 11;
+            case "C":
+                return 12;
+            case "D":
+                return 13;
+            default:
+                return Integer.valueOf(t);
+        }
     }
 
     public static void showDialog(String title, String msg, Context context) {
@@ -258,20 +267,19 @@ public class Utility {
         return new Semester(year, sem);
     }
 
-    public static <T> boolean isArrayAreSame(T[] arr1, T[] arr2) {
-        return Arrays.equals(arr1, arr2);
-        /*
+    public static <T> boolean isSparseArrayAreSame(SparseArray<T> arr1, SparseArray<T> arr2) {
         if (arr1 == null || arr2 == null)
             return false;
 
-        if (arr1.length != arr2.length)
+        if (arr1.size() != arr2.size())
             return false;
 
-        for (int i = 0; i < arr1.length; i++) {
-            if (!arr1[i].equals(arr2[i])) return false;
+        for (int i = 0; i < arr1.size(); i++) {
+            final int key = arr1.keyAt(i);
+            if (!arr1.get(key).equals(arr2.get(key)))
+                return false;
         }
 
         return true;
-        */
     }
 }

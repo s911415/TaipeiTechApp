@@ -35,8 +35,7 @@ import app.taipeitech.utility.WifiUtility;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class CourseFragment extends BaseFragment implements OnClickListener,
-        TableInitializeListener {
+public class CourseFragment extends BaseFragment implements OnClickListener, TableInitializeListener, CourseDetailInterface {
     private static String[] TIME_ARRAY;
     private ArrayList<Semester> semesters = new ArrayList<>();
     private CourseTableLayout courseTable;
@@ -307,12 +306,16 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
         course_dialog_builder.setTitle(courseName);
         String classRoom = "N/A";
         if (week < 7) {
-            classRoom = course.getCourseRooms()[week];
+            classRoom = course.getCourseRooms().get(week);
         }
         String message = String.format(Locale.TAIWAN,
-                "課號：%s\n時間：%s\n地點：%s\n授課老師：%s", course.getCourseNo(),
-                TIME_ARRAY[id - 1], classRoom,
-                course.getCourseTeacher());
+                "課號：%s\n時間：%s\n地點：%s\n開課班級：%s\n授課老師：%s",
+                course.getCourseNo(),
+                TIME_ARRAY[id - 1],
+                classRoom,
+                course.getCourseClass(),
+                course.getCourseTeacher()
+        );
         course_dialog_builder.setMessage(message);
         course_dialog_builder.setPositiveButton("詳細內容", courseDetailDialogLis);
         course_dialog_builder.show();
@@ -371,6 +374,6 @@ public class CourseFragment extends BaseFragment implements OnClickListener,
     private void showCourse(StudentCourse studentCourse) {
         mSemester = new Semester(studentCourse.getYear(), studentCourse.getSemester());
         mSemesterSelector.setText(mSemester);
-        courseTable.showCourse(studentCourse);
+        courseTable.showCourse(studentCourse.getCourseList());
     }
 }

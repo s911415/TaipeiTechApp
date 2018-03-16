@@ -21,6 +21,7 @@ import app.taipeitech.model.StudentCourse;
 import app.taipeitech.utility.Utility;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 
 public class CourseTableLayout extends LinearLayout {
@@ -155,19 +156,18 @@ public class CourseTableLayout extends LinearLayout {
         }
     }
 
-    public void showCourse(StudentCourse studentCourse) {
+    public void showCourse(final ArrayList<CourseInfo> courseInfoList) {
         resetCourseTable();
         int color_index = 0;
-        int[] color_array = getColorArray(studentCourse.getCourseList().size());
+        int[] color_array = getColorArray(courseInfoList.size());
         int count = 0;
-        for (CourseInfo item : studentCourse.getCourseList()) {
+        for (CourseInfo item : courseInfoList) {
             boolean is_have_time = false;
             for (int i = 0; i < 7; i++) {
-                String time = item.getCourseTimes()[i];
-                ArrayList<String> s = Utility.splitTime(time);
-                for (String t : s) {
+                HashSet<String> times = item.getCourseTimes().get(i);
+                for (String t : times) {
                     if (t.length() != 0) {
-                        int row = Integer.valueOf(t);
+                        int row = Utility.convertTime(t);
                         int col = i == 0 ? 7 : i;
                         isDisplayABCD = isDisplayABCD || row > 9;
                         isDisplaySun = isDisplaySun || i == 0;

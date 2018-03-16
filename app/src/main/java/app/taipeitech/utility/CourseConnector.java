@@ -2,6 +2,7 @@ package app.taipeitech.utility;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import app.taipeitech.classroom.data.Classroom;
 import app.taipeitech.course.data.Semester;
 import app.taipeitech.model.CourseCollectionInfo;
@@ -270,14 +271,15 @@ public class CourseConnector {
             }
             course.setCourseName(cols[1].getText().toString());
             course.setCourseTeacher(cols[6].getText().toString());
+            course.setCourseClass(cols[7].getText().toString());
             course.setCourseTime(new String[]{
-                    cols[8].getText().toString().trim(),
-                    cols[9].getText().toString().trim(),
-                    cols[10].getText().toString().trim(),
-                    cols[11].getText().toString().trim(),
-                    cols[12].getText().toString().trim(),
-                    cols[13].getText().toString().trim(),
-                    cols[14].getText().toString().trim()
+                    cols[8].getText().toString(),
+                    cols[9].getText().toString(),
+                    cols[10].getText().toString(),
+                    cols[11].getText().toString(),
+                    cols[12].getText().toString(),
+                    cols[13].getText().toString(),
+                    cols[14].getText().toString()
             });
             updateClassRoom(course, tagNode2);
             courses.add(course);
@@ -286,18 +288,19 @@ public class CourseConnector {
     }
 
     private static void updateClassRoom(CourseInfo course, TagNode tagNode) {
-        final String[] courseTimes = course.getCourseTimes();
-        String[] courseRooms = new String[courseTimes.length];
+        final SparseArray<HashSet<String>> courseTimes = course.getCourseTimes();
+        String[] courseRooms = new String[courseTimes.size()];
         TagNode[] rows = tagNode.getElementsByName("tr", true);
         final int START_ROW = 2;
         boolean hasWeekend = rows[1].getAllChildren().size() == 8;
-        for (int i = 0; i < courseTimes.length; i++) {
+        for (int i = 0; i < courseTimes.size(); i++) {
             courseRooms[i] = "";
             if (!hasWeekend && (i == 0 || i == 6)) continue;
             try {
-                String[] courseTimeArr = courseTimes[i].trim().split("\\s");
-                if (courseTimeArr.length == 0) continue;
-                int firstSection = Integer.parseInt(courseTimeArr[0], 16);
+                List<String> courseTimeArr = new ArrayList<>(courseTimes.get(i));
+                if (courseTimeArr.size() == 0) continue;
+                Collections.sort(courseTimeArr);
+                int firstSection = Utility.convertTime(courseTimeArr.get(0));
                 int col = hasWeekend ? i + 1 : i;
                 TagNode td = rows[firstSection + START_ROW - 1].getChildTagList().get(col);
                 TagNode[] links = td.getElementsByName("a", false);
@@ -346,7 +349,7 @@ public class CourseConnector {
         return ret;
     }
 
-    public static StudentCourse getClassroomCourses(String year, String semester, String code) throws Exception {
+    public static ArrayList<CourseInfo> getClassroomCourses(String year, String semester, String code) throws Exception {
         HashMap<String, String> params = new HashMap<>();
         params.put("format", "-3");
         params.put("year", year);
@@ -359,9 +362,6 @@ public class CourseConnector {
             final TagNode coursesTable = tables[1];
             final TagNode[] rows = coursesTable.getElementsByName("tr", true);
             final TagNode[][] courseTableArray = new TagNode[13][7];
-            HashMap<String, CourseInfo> courseMap = new HashMap<>();
-            ArrayList<HtmlNode> _tmpNodes = new ArrayList<>();
-            Pattern sectionNoPattern = Pattern.compile("^\\(([0-9A-Za-z]+)\\)");
             int rowIdx = 0;
             for (final TagNode row : rows) {
                 final TagNode[] cells = row.getAllElements(false);
@@ -375,92 +375,105 @@ public class CourseConnector {
                     System.arraycopy(cells, 1, courseTableArray[rowIdx], 1, 5);
                     rowIdx++;
                 }
-
-                for (int week = 0; week < 7; week++) {
-                    for (int section = 0; section < 13; section++) {
-                        TagNode cell = courseTableArray[section][week];
-                        if (cell == null) continue;
-                        _tmpNodes.clear();
-
-                        for (BaseToken baseToken : cell.getAllChildren()) {
-                            if (baseToken instanceof TagNode) {
-                                final String tagName = ((TagNode) baseToken).getName();
-
-                                if (!tagName.equals("br")) {
-                                    _tmpNodes.add((TagNode) baseToken);
-                                }
-                            } else if (baseToken instanceof ContentNode) {
-                                if (!((ContentNode) baseToken).getContent().trim().isEmpty()) {
-                                    _tmpNodes.add((ContentNode) baseToken);
-                                }
-                            }
-                        }
-
-                        if (week == 2 && section == 4) {
-                            section *= 1;
-                        }
-
-                        for (int j = 0, k = _tmpNodes.size(); j < k; j++) {
-                            final HtmlNode node = _tmpNodes.get(j);
-                            if (node instanceof TagNode) {
-                                final TagNode tNode = (TagNode) node;
-                                if (tNode.getAttributeByName("href").startsWith("Curr.jsp") && _tmpNodes.get(j - 1) instanceof ContentNode) {
-                                    ContentNode contentNode = (ContentNode) _tmpNodes.get(j - 1);
-                                    Matcher m = sectionNoPattern.matcher(contentNode.getContent().trim());
-                                    if (m.find()) {
-                                        String sectionNo = m.group(1);
-                                        CourseInfo cInfo = courseMap.get(sectionNo);
-                                        String[] courseTime = null;
-                                        if (cInfo == null) {
-                                            cInfo = new CourseInfo();
-                                            courseMap.put(sectionNo, cInfo);
-                                            cInfo.setCourseNo(sectionNo);
-                                            cInfo.setCourseName(tNode.getText().toString().trim());
-                                            courseTime = new String[7];
-                                            for (int u = 0; u < courseTime.length; u++) {
-                                                courseTime[u] = "";
-                                            }
-                                            cInfo.setCourseTime(courseTime);
-                                        } else {
-                                            courseTime = cInfo.getCourseTimes();
-                                        }
-                                        HashSet<String> tmpSet = new HashSet<>(Arrays.asList(courseTime[week].split(" ")));
-                                        tmpSet.add(String.valueOf(section + 1));
-                                        courseTime[week] = TextUtils.join(" ", tmpSet);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
-            ArrayList<CourseInfo> tmpRet = new ArrayList<>(courseMap.values());
+            ArrayList<CourseInfo> tmpRet = new ArrayList<>(processCourseInfoMap(courseTableArray));
             ArrayList<CourseInfo> ret = new ArrayList<>();
+            HashSet<CourseInfo> addedCourse = new HashSet<>();
             for (int i = 0, k = tmpRet.size(); i < k - 1; i++) {
                 CourseCollectionInfo collectionInfo = new CourseCollectionInfo();
                 final CourseInfo iCourse = tmpRet.get(i);
                 collectionInfo.addCourseInfo(iCourse);
                 for (int j = i + 1; j < k; j++) {
                     final CourseInfo jCourse = tmpRet.get(j);
-                    if (Utility.isArrayAreSame(iCourse.getCourseTimes(), jCourse.getCourseTimes())) {
+                    if (Utility.isSparseArrayAreSame(iCourse.getCourseTimes(), jCourse.getCourseTimes())) {
                         collectionInfo.addCourseInfo(jCourse);
+                        addedCourse.add(jCourse);
                     }
                 }
 
-                ret.add(collectionInfo);
+                if (!addedCourse.contains(iCourse)) {
+                    ret.add(collectionInfo);
+                }
             }
 
-
-            StudentCourse student = new StudentCourse();
-            student.setSid("0");
-            student.setYear(year);
-            student.setSemester(semester);
-            student.setCourseList(ret);
-            return student;
+            return ret;
         } else {
             throw new Exception("Format changed");
         }
+    }
+
+    private static Collection<CourseInfo> processCourseInfoMap(final TagNode[][] courseTableArray) {
+        HashMap<String, CourseInfo> courseMap = new HashMap<>();
+        ArrayList<HtmlNode> _tmpNodes = new ArrayList<>();
+        Pattern sectionNoPattern = Pattern.compile("^\\(([0-9A-Za-z]+)\\)");
+        for (int week = 0; week < 7; week++) {
+            for (int section = 0; section < 13; section++) {
+                TagNode cell = courseTableArray[section][week];
+                if (cell == null) continue;
+                _tmpNodes.clear();
+
+                for (BaseToken baseToken : cell.getAllChildren()) {
+                    if (baseToken instanceof TagNode) {
+                        final String tagName = ((TagNode) baseToken).getName();
+
+                        if (!tagName.equals("br")) {
+                            _tmpNodes.add((TagNode) baseToken);
+                        }
+                    } else if (baseToken instanceof ContentNode) {
+                        if (!((ContentNode) baseToken).getContent().trim().isEmpty()) {
+                            _tmpNodes.add((ContentNode) baseToken);
+                        }
+                    }
+                }
+
+                for (int j = 0, k = _tmpNodes.size(); j < k; j++) {
+                    final HtmlNode node = _tmpNodes.get(j);
+                    if (node instanceof TagNode) {
+                        final TagNode tNode = (TagNode) node;
+                        if (tNode.getAttributeByName("href").startsWith("Curr.jsp") && _tmpNodes.get(j - 1) instanceof ContentNode) {
+                            ContentNode contentNode = (ContentNode) _tmpNodes.get(j - 1);
+                            Matcher m = sectionNoPattern.matcher(contentNode.getContent().trim());
+                            if (m.find()) {
+                                String sectionNo = m.group(1);
+                                CourseInfo cInfo = courseMap.get(sectionNo);
+                                if (cInfo == null) {
+                                    cInfo = new CourseInfo();
+                                    courseMap.put(sectionNo, cInfo);
+                                    cInfo.setCourseNo(sectionNo);
+                                    cInfo.setCourseName(tNode.getText().toString().trim());
+                                    List<String> classList = new ArrayList<>();
+                                    if (week == 5 && section == 1) {
+                                        week = 5;
+                                    }
+                                    for (j++; j < k; j++) {
+                                        if (_tmpNodes.get(j) instanceof TagNode) {
+                                            TagNode classTag = (TagNode) _tmpNodes.get(j);
+                                            String href = classTag.getAttributeByName("href");
+                                            if (href != null && href.startsWith("Subj.jsp")) {
+                                                classList.add(classTag.getText().toString().trim());
+                                            } else {
+                                                j--;
+                                                break;
+                                            }
+
+                                        } else {
+                                            j--;
+                                            break;
+                                        }
+                                    }
+
+                                    cInfo.setCourseClass(TextUtils.join(", ", classList));
+                                }
+                                cInfo.addCourseTime(week, String.valueOf(section + 1));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return courseMap.values();
     }
 
 

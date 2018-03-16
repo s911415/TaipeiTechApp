@@ -27,13 +27,6 @@
                     android:prompt="@string/building"
                     android:textSize="@dimen/textMedium"/>
 
-            <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="10dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/course_icon"/>
-
             <app.taipeitech.classroom.component.ClassroomSpinner
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:id="@+id/classroomSpinner"

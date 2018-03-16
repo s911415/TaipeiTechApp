@@ -1,8 +1,10 @@
 package app.taipeitech.model;
 
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class CourseCollectionInfo extends CourseInfo {
@@ -32,12 +34,20 @@ public class CourseCollectionInfo extends CourseInfo {
         return "";
     }
 
-    public String[] getCourseTimes() {
+    public SparseArray<HashSet<String>> getCourseTimes() {
         return _list.get(0).getCourseTimes();
     }
 
-    public String[] getCourseRooms() {
-        return _list.get(0).getCourseTimes();
+    public SparseArray<String> getCourseRooms() {
+        return _list.get(0).getCourseRooms();
+    }
+
+    public CourseInfo getCourseAt(int i) {
+        return _list.get(i);
+    }
+
+    public ArrayList<CourseInfo> getCourses() {
+        return _list;
     }
 
     public void setCourseNo(String courseNo) {

@@ -7,14 +7,13 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import app.taipeitech.R;
 import app.taipeitech.classroom.data.Classroom;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchListener, ClassroomListDialog.SearchableItem<Classroom> {
-
-    public static final int NO_ITEM_SELECTED = -1;
     private Context _context;
     private List<Classroom> _items, _dataset;
     private ClassroomListDialog _searchableListDialog;
@@ -46,6 +45,8 @@ public class ClassroomSpinner extends AppCompatSpinner implements View.OnTouchLi
         _dataset = new ArrayList<>();
         _searchableListDialog = ClassroomListDialog.newInstance(_items);
         _searchableListDialog.setOnSearchableItemClickListener(this);
+        _searchableListDialog.setTitle(getContext().getResources().getString(R.string.no_classroom_selected));
+        _searchableListDialog.setPositiveButton(getContext().getResources().getString(R.string.close_drawer));
         setOnTouchListener(this);
     }
 

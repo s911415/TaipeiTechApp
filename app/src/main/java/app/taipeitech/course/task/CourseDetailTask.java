@@ -3,6 +3,7 @@ package app.taipeitech.course.task;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
+import app.taipeitech.course.CourseDetailInterface;
 import app.taipeitech.course.CourseFragment;
 import app.taipeitech.model.Model;
 import app.taipeitech.utility.NportalConnector;
@@ -13,17 +14,17 @@ import java.lang.ref.WeakReference;
  * Created by Alan on 2015/9/13.
  */
 public class CourseDetailTask extends AsyncTask<String, Void, Object> {
-    private WeakReference<CourseFragment> mCourseFragmentWeakReference;
+    private WeakReference<CourseDetailInterface> mCourseFragmentWeakReference;
     private WeakReference<ProgressDialog> mProgressDialogWeakReference;
 
-    public CourseDetailTask(CourseFragment fragment) {
+    public CourseDetailTask(CourseDetailInterface fragment) {
         mCourseFragmentWeakReference = new WeakReference<>(fragment);
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        CourseFragment fragment = mCourseFragmentWeakReference.get();
+        CourseDetailInterface fragment = mCourseFragmentWeakReference.get();
         if (fragment != null && !NportalConnector.isLogin()) {
             ProgressDialog progressDialog = ProgressDialog.show(fragment.getContext(), null, "登入校園入口網站中...");
             mProgressDialogWeakReference = new WeakReference<>(progressDialog);
@@ -56,7 +57,7 @@ public class CourseDetailTask extends AsyncTask<String, Void, Object> {
                 progressDialog.dismiss();
             }
         }
-        CourseFragment fragment = mCourseFragmentWeakReference.get();
+        CourseDetailInterface fragment = mCourseFragmentWeakReference.get();
         if (fragment != null) {
             fragment.startCourseDetail(object);
         }

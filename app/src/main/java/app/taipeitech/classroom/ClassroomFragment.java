@@ -1,8 +1,10 @@
 package app.taipeitech.classroom;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -11,25 +13,27 @@ import app.taipeitech.BaseFragment;
 import app.taipeitech.R;
 import app.taipeitech.classroom.component.ClassroomListDialog;
 import app.taipeitech.classroom.component.ClassroomSpinner;
+import app.taipeitech.classroom.component.CourseListDialog;
 import app.taipeitech.classroom.data.Building;
 import app.taipeitech.classroom.data.Classroom;
 import app.taipeitech.classroom.task.FetchClassroomUsageTask;
 import app.taipeitech.classroom.task.SearchClassroomTask;
+import app.taipeitech.course.CourseDetailActivity;
+import app.taipeitech.course.CourseDetailInterface;
 import app.taipeitech.course.CourseTableLayout;
 import app.taipeitech.course.CourseTableLayout.TableInitializeListener;
 import app.taipeitech.course.data.Semester;
+import app.taipeitech.course.task.CourseDetailTask;
 import app.taipeitech.model.ClassroomsInfo;
+import app.taipeitech.model.CourseCollectionInfo;
 import app.taipeitech.model.CourseInfo;
 import app.taipeitech.model.Model;
-import app.taipeitech.model.StudentCourse;
 import app.taipeitech.utility.Utility;
 import app.taipeitech.utility.WifiUtility;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-public class ClassroomFragment extends BaseFragment implements OnClickListener,
+public class ClassroomFragment extends BaseFragment implements OnClickListener, CourseDetailInterface,
         TableInitializeListener {
     private static String[] TIME_ARRAY;
     private CourseTableLayout courseTable;
@@ -38,9 +42,11 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
     private ClassroomSpinner classroomSpinner;
     private BuildingSelector mBuildingSelector;
     private static View fragmentView;
-    private boolean needShowSemesterDialog = true;
     private final static String ALL_TEXT = "[全部]";
     private final Semester curSem = Utility.getCurrentSemesterInfo();
+    private String selectedCourseNo = "";
+    private CourseListDialog _courseListDialog;
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -137,7 +143,6 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
 
     }
 
-
     private LinkedHashMap<String, Building> getBuildingList(List<Classroom> classrooms) {
         LinkedHashMap<String, Building> ret = new LinkedHashMap<>();
         Building _all = new Building(ALL_TEXT);
@@ -175,16 +180,31 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
         }
     };
 
+    public DialogInterface.OnClickListener courseDetailDialogLis = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface arg0, int arg1) {
+            if (WifiUtility.isNetworkAvailable(getActivity())) {
+                if (Utility.checkAccount(getActivity())) {
+                    CourseDetailTask courseDetailTask = new CourseDetailTask(ClassroomFragment.this);
+                    courseDetailTask.execute(selectedCourseNo);
+                }
+            } else {
+                Toast.makeText(getActivity(),
+                        R.string.check_network_available, Toast.LENGTH_LONG)
+                        .show();
+            }
+        }
+    };
+
 
     public void obtainCourseList(Object object) {
-        if (object instanceof StudentCourse) {
-            StudentCourse result = (StudentCourse) object;
-            showCourse(result);
+        if (object instanceof ArrayList) {
+            showCourse((ArrayList<CourseInfo>) object);
         }
     }
 
-    private void showCourse(StudentCourse studentCourse) {
-        courseTable.showCourse(studentCourse);
+    private void showCourse(ArrayList<CourseInfo> courseList) {
+        courseTable.showCourse(courseList);
     }
 
     private ClassroomListDialog.SearchableItem<Classroom> onClassroomSelected = new ClassroomListDialog.SearchableItem<Classroom>() {
@@ -196,14 +216,38 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
     };
 
     @Override
-    public void onClick(View view) {
-        CourseInfo item = (CourseInfo) view.getTag(R.id.course);
-        int week = (int) view.getTag(R.id.week);
-        showInfoDialog(view.getId(), week, item.getCourseName(), item);
+    public void onClick(final View view) {
+        CourseCollectionInfo item = (CourseCollectionInfo) view.getTag(R.id.course);
+        final int week = (int) view.getTag(R.id.week);
+        if (item.isExactlyOne()) {
+            showInfoDialog(view.getId(), week, item.getCourseName(), item.getCourseAt(0));
+        } else {
+            _courseListDialog = CourseListDialog.newInstance(item.getCourses());
+            _courseListDialog.setTitle(getString(R.string.course_detail_title));
+            _courseListDialog.setPositiveButton(getString(R.string.close_drawer));
+            _courseListDialog.setOnItemClickListener(new CourseListDialog.ClickableItem() {
+                @Override
+                public void onItemClicked(CourseInfo item, int position) {
+                    showInfoDialog(view.getId(), week, item.getCourseName(), item);
+                }
+            });
+            _courseListDialog.show(this.getFragmentManager(), "x");
+        }
     }
 
     private void showInfoDialog(int id, int week, String courseName, CourseInfo course) {
-
+        selectedCourseNo = course.getCourseNo();
+        AlertDialog.Builder course_dialog_builder = new AlertDialog.Builder(getActivity());
+        course_dialog_builder.setTitle(courseName);
+        String message = String.format(Locale.TAIWAN,
+                "課號：%s\n時間：%s\n開課班級：%s",
+                course.getCourseNo(),
+                TIME_ARRAY[id - 1],
+                course.getCourseClass()
+        );
+        course_dialog_builder.setMessage(message);
+        course_dialog_builder.setPositiveButton("詳細內容", courseDetailDialogLis);
+        course_dialog_builder.show();
     }
 
     @Override
@@ -238,4 +282,15 @@ public class ClassroomFragment extends BaseFragment implements OnClickListener,
         return R.string.classroom_text;
     }
 
+    @Override
+    public void startCourseDetail(Object object) {
+        if (object instanceof String) {
+            showAlertMessage((String) object);
+        } else if (object instanceof Boolean) {
+            Intent i = new Intent(getActivity(),
+                    CourseDetailActivity.class);
+            i.putExtra("CourseNo", selectedCourseNo);
+            startActivityForResult(i, 2);
+        }
+    }
 }
