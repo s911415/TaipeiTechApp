@@ -15,15 +15,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CreditConnector {
-    private final static String POST_CREDIT_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_003&apUrl=http://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
-    private final static String POST_SEPF_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apUrl=http://sepf.ntut.edu.tw/student/wp-login.php&apOu=aa_023&sso=true";
+    private final static String POST_CREDIT_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_003&apUrl=https://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
+    private final static String POST_SEPF_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apUrl=https://sepf.ntut.edu.tw/student/wp-login.php&apOu=aa_023&sso=true";
     private final static String SEPF_URI = "https://sepf.ntut.edu.tw/student/wp-login.php";
-    private final static String CREDITS_URI = "http://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
-    private final static String CREDIT_URI = "http://aps-stu.ntut.edu.tw/StuQuery/QryScore.jsp";
+    private final static String CREDITS_URI = "https://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
+    private final static String CREDIT_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QryScore.jsp";
     private final static String ALL_CREDIT_URI = "https://sepf.ntut.edu.tw/student/%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/score/";
-    private final static String GENERAL_URI = "http://aps-stu.ntut.edu.tw/StuQuery/QryLAECourse.jsp";
-    private final static String STANDARD_URI = "http://aps.ntut.edu.tw/course/tw/Cprog.jsp";
-    private final static String CURRENT_URI = "http://aps-stu.ntut.edu.tw/StuQuery/QrySCWarn.jsp";
+    private final static String GENERAL_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QryLAECourse.jsp";
+    private final static String STANDARD_URI = "https://aps.ntut.edu.tw/course/tw/Cprog.jsp";
+    private final static String CURRENT_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QrySCWarn.jsp";
 
     public static ArrayList<String> matrics = new ArrayList<>();
     public static Boolean isHaveError = false;

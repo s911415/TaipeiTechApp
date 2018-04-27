@@ -16,11 +16,11 @@ import java.util.regex.Pattern;
 
 public class CourseConnector {
     private static boolean isLogin = false;
-    private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
-    private static final String COURSES_URI = "http://aps.ntut.edu.tw/course/tw/courseSID.jsp";
-    private static final String COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Select.jsp";
-    private static final String CLASSROOM_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp";
-    private static final String CLASSROOM_COURSE_URI = "http://aps.ntut.edu.tw/course/tw/Croom.jsp";
+    private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=https://aps.ntut.edu.tw/course/tw/courseSID.jsp";
+    private static final String COURSES_URI = "https://aps.ntut.edu.tw/course/tw/courseSID.jsp";
+    private static final String COURSE_URI = "https://aps.ntut.edu.tw/course/tw/Select.jsp";
+    private static final String CLASSROOM_URI = "https://aps.ntut.edu.tw/course/tw/Croom.jsp";
+    private static final String CLASSROOM_COURSE_URI = "https://aps.ntut.edu.tw/course/tw/Croom.jsp";
 
     public static String loginCourse() throws Exception {
         try {
