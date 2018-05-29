@@ -1,7 +1,8 @@
 # Reference : https://github.com/kamisakihideyoshi/TaipeiTechRefined
 import re
 import sys
-from urllib.request import urlopen
+import urllib.request
+import urllib.request
 
 from bs4 import BeautifulSoup
 
@@ -35,9 +36,11 @@ def process_string_to_date(data_str, prev_date=None):
 
 
 def main():
+    url = "https://oaa.ntut.edu.tw/files/13-1001-77326.php?Lang=zh-tw"
+    hdr = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
+    req = urllib.request.Request(url, headers=hdr)
+    html = response = urllib.request.urlopen(req)
     dataList = []
-    html = urlopen(
-        "http://www.cc.ntut.edu.tw/~wwwoaa/oaa-nwww/oaa-cal/oaa-cal_106.html")
     soup = BeautifulSoup(html.read(), "html.parser")
 
     # 所有 <P> 的清單
