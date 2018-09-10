@@ -7,20 +7,14 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.PrettyHtmlSerializer;
 import org.htmlcleaner.TagNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CreditConnector {
     private final static String POST_CREDIT_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_003&apUrl=https://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
-    private final static String POST_SEPF_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apUrl=https://sepf.ntut.edu.tw/student/wp-login.php&apOu=aa_023&sso=true";
-    private final static String SEPF_URI = "https://sepf.ntut.edu.tw/student/wp-login.php";
     private final static String CREDITS_URI = "https://aps-stu.ntut.edu.tw/StuQuery/LoginSID.jsp";
     private final static String CREDIT_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QryScore.jsp";
-    private final static String ALL_CREDIT_URI = "https://sepf.ntut.edu.tw/student/%E5%AD%B8%E7%BF%92%E7%B4%80%E9%8C%84/score/";
     private final static String GENERAL_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QryLAECourse.jsp";
     private final static String STANDARD_URI = "https://aps.ntut.edu.tw/course/tw/Cprog.jsp";
     private final static String CURRENT_URI = "https://aps-stu.ntut.edu.tw/StuQuery/QrySCWarn.jsp";
@@ -50,67 +44,67 @@ public class CreditConnector {
         }
     }
 
-    public static String loginSepf() throws Exception {
-        try {
-            String result = Connector.getDataByGet(POST_SEPF_URI, "utf-8", "https://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
-            TagNode tagNode;
-            tagNode = new HtmlCleaner().clean(result);
-            String sessionId = tagNode.getElementsByAttValue("name", "sessionId", true, false)[0].getAttributeByName("value");
-            String userid = tagNode.getElementsByAttValue("name", "userid", true, false)[0].getAttributeByName("value");
-            String name = tagNode.getElementsByAttValue("name", "name", true, false)[0].getAttributeByName("value");
-            HashMap<String, String> params = new HashMap<>();
-            params.put("sessionId", sessionId);
-            params.put("userid", userid);
-            params.put("name", name);
-            result = Connector.getDataByPost(SEPF_URI, params, "utf-8");
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("登入學生查詢系統時發生錯誤");
-        }
-    }
-
-    public static StudentCredit getCredits(Handler progressHandler)
-            throws Exception {
+    public static StudentCredit getCredits(Handler progressHandler) throws Exception {
         try {
             isHaveError = false;
             HashMap<String, String> params = new HashMap<>();
-            params.put("score", "歷年成績查詢");
-            String result = Connector.getDataByPost(ALL_CREDIT_URI, params, "utf-8");
+            params.put("format", "-2");
+            String result = Connector.getDataByPost(CREDIT_URI, params, "big5");
             int total = getCourseCount(result);
             progressHandler.obtainMessage(1, total).sendToTarget();
             TagNode tagNode;
             tagNode = new HtmlCleaner().clean(result);
-            tagNode = tagNode.findElementByAttValue("id", "center3", true, true);
-            TagNode[] nodes = tagNode.getElementsByAttValue("width", "600",
-                    true, false);
+            TagNode[] titles = tagNode.getElementsByName("H3", true);
 
             int count = 0;
             StudentCredit studentCredit = new StudentCredit();
-            //studentCredit = getCurrentCredit(studentCredit);
-            for (TagNode table : nodes) {
-                String title = table.findElementByName("caption", true).getText().toString().trim();
-                String[] temp = title.split(" ");
-                TagNode[] rows = table.getElementsByName("tr", true);
+            studentCredit = getCurrentCredit(studentCredit);
+            Map<String, TagNode> creditMap = new LinkedHashMap<>();
+            List<TagNode> bodys = null;
+            int lastSearchIdx = -1;
+            int bodySize = 0;
+            for (TagNode h3 : titles) {
+                String titleText = h3.getText().toString().trim();
+                if (!titleText.endsWith("學期") || !titleText.contains("學年度")) continue;
+                titleText = titleText.replaceAll("\\D", "");
                 SemesterCredit semester = new SemesterCredit();
-                semester.setYear(temp[0].replaceAll("\\D+$", ""));
-                semester.setSemester(temp[2]);
-                if(rows.length==1){
-                    semester.setConductScore("XD");
-                    semester.setScore("XD");
-                }else{
-                    for (int i = 1; i < rows.length - 5; i++) {
-                        TagNode[] cols = rows[i].getElementsByName("td", true);
-                        String score = cols[5].getText().toString().trim();
-                        String courseNo = cols[0].getText().toString().trim();
-                        CreditInfo credit = new CreditInfo();
+                semester.setYear(titleText.substring(0, titleText.length() - 1));
+                semester.setSemester(titleText.substring(titleText.length() - 1));
+                if (bodys == null) {
+                    bodys = h3.getParent().getChildTagList();
+                    lastSearchIdx = bodys.indexOf(h3);
+                    bodySize = bodys.size();
+                } else {
+                    while (lastSearchIdx < bodySize && !bodys.get(lastSearchIdx).equals(h3)) {
+                        lastSearchIdx++;
+                    }
+                }
 
-                        credit.setCourseNo(courseNo);
-                        credit.setCourseName(cols[2].getText().toString().trim());
-                        credit.setCredit((int) Double.parseDouble(cols[4].getText()
+                TagNode scoreTable = null;
+                for (int i = lastSearchIdx + 1; i < bodys.size(); i++) {
+                    lastSearchIdx = i;
+                    String tag = bodys.get(i).getName().toUpperCase();
+                    if (tag.equals("H3")) break;
+                    if (tag.equals("TABLE")) {
+                        scoreTable = bodys.get(i);
+                        break;
+                    }
+                }
+
+                if (scoreTable != null) {
+                    TagNode[] rows = scoreTable.getElementsByName("tr", true);
+                    final int headerColNum = rows[0].getElementsByName("th", false).length;
+                    for (int i = 1; i < rows.length; i++) {
+                        TagNode[] cols = rows[i].getChildTags();
+                        if (cols.length != headerColNum) break;
+                        CreditInfo credit = new CreditInfo();
+                        credit.setCourseNo(cols[0].getText().toString());
+                        credit.setCourseName(cols[2].getText().toString());
+                        credit.setCredit((int) Double.parseDouble(cols[5].getText()
                                 .toString()));
-                        credit.setScore(cols[5].getText().toString().trim());
-                        int type = getCourseType(courseNo, score);
+                        credit.setScore(cols[6].getText().toString());
+                        int type = getCourseType(cols[0].getText().toString(),
+                                cols[6].getText().toString());
                         credit.setType(type);
                         semester.addCreditInfo(credit);
                         count++;
@@ -118,13 +112,13 @@ public class CreditConnector {
                     }
                     TagNode[] cols = rows[rows.length - 3].getElementsByName("td",
                             true);
-                    semester.setConductScore(cols[0].getText().toString().trim());
+                    semester.setConductScore(cols[0].getText().toString());
                     cols = rows[rows.length - 4].getElementsByName("td", true);
-                    semester.setScore(cols[0].getText().toString().trim());
+                    semester.setScore(cols[0].getText().toString());
+                    studentCredit.addSemesterCredit(semester);
                 }
-                studentCredit.addSemesterCredit(semester);
-
             }
+
             studentCredit = getGeneralCredit(studentCredit);
             studentCredit = Utility.cleanString(studentCredit);
             return studentCredit;
@@ -215,17 +209,17 @@ public class CreditConnector {
     private static int getCourseCount(String result) {
         TagNode tagNode;
         tagNode = new HtmlCleaner().clean(result);
-        TagNode[] nodes = tagNode.getElementsByAttValue("width", "600", true,
+        TagNode[] nodes = tagNode.getElementsByAttValue("border", "1", true,
                 false);
-
-        Set<String> sems = new HashSet<>();
+        int count = 0;
         for (TagNode table : nodes) {
-            TagNode[] caption = table.getElementsByName("caption", true);
-            if (caption.length == 1) {
-                sems.add(caption[0].getText().toString());
+            TagNode[] rows = table.getElementsByName("tr", true);
+            for (int i = 1; i < rows.length - 6; i++) {
+                count++;
             }
         }
-        return sems.size();
+        return count;
+
     }
 
     private static int getCourseType(String courseNo, String score) {
@@ -289,7 +283,7 @@ public class CreditConnector {
             throws Exception {
         try {
             matrics.clear();
-            ArrayList<String> divison_list = new ArrayList<>();
+            ArrayList<String> division_list = new ArrayList<>();
             HashMap<String, String> params = new HashMap<>();
             params.put("format", "-2");
             params.put("year", year);
@@ -303,31 +297,36 @@ public class CreditConnector {
                 String[] temp = row.getAttributeByName("href").split("=");
                 String matric = temp[temp.length - 1];
                 matrics.add(matric);
-                divison_list.add(division);
+                division_list.add(division);
             }
-            return divison_list;
+            return division_list;
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("學制清單讀取時發生錯誤");
         }
     }
 
+    //取得科系列表
     public static ArrayList<String> getDepartmentList(String year, int index)
             throws Exception {
         try {
             ArrayList<String> departemt_list = new ArrayList<>();
+            //登入網頁
             HashMap<String, String> params = new HashMap<>();
             params.put("format", "-3");
             params.put("year", year);
             params.put("matric", matrics.get(index));
             String result = Connector
                     .getDataByPost(STANDARD_URI, params, "big5");
+            //取出所需資料
             TagNode tagNode;
             tagNode = new HtmlCleaner().clean(result);
             TagNode[] tables = tagNode.getElementsByAttValue("border", "1",
                     true, false);
+            //取出第一個超連結的內容 <- 因網頁裡的科系名有加上超連結，連到課程科目表
             TagNode[] rows = tables[0].getElementsByName("a", true);
             for (TagNode row : rows) {
+                //加入科系列表
                 String department = row.getText().toString();
                 departemt_list.add(department);
             }
@@ -366,7 +365,7 @@ public class CreditConnector {
             for (int i = 1; i < rows.length; i++) {
                 TagNode[] cols = rows[i].getElementsByName("td", true);
                 String temp = cols[0].getText().toString();
-                if (temp.contains(department)) {
+                if (temp.replace(" ", "").replace("\n", "").contains(department.replace(" ", "").replace("\n", ""))) {
                     for (int j = 1; j < 9; j++) {
                         String credit = Utility.cleanString(cols[j].getText()
                                 .toString());
