@@ -263,7 +263,7 @@ public class CreditFragment extends BaseFragment implements OnClickListener,
         String account = Model.getInstance().getAccount();
         String password = Model.getInstance().getPassword();
         if (account.length() > 0 && password.length() > 0) {
-            NportalConnector.login(account, password, loginHandler);
+            NportalConnector.login(account, password, this.getActivity(), loginHandler);
         } else {
             pd.dismiss();
             showAlertMessage("請先至帳號設定，設定校園入口網站帳號密碼！");

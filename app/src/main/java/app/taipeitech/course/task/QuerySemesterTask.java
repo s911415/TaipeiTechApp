@@ -1,6 +1,8 @@
 package app.taipeitech.course.task;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import app.taipeitech.utility.Constants;
@@ -43,7 +45,8 @@ public class QuerySemesterTask extends AsyncTask<String, Void, Object> {
                 if (!NportalConnector.isLogin()) {
                     String account = Model.getInstance().getAccount();
                     String password = Model.getInstance().getPassword();
-                    NportalConnector.login(account, password);
+                    WeakReference<Activity> contextWeakReference = new WeakReference<>(mCourseFragmentWeakReference.get().getActivity());
+                    NportalConnector.login(contextWeakReference, account, password);
                 }
                 if (!CourseConnector.isLogin()) {
                     CourseConnector.loginCourse();

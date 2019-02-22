@@ -23,9 +23,10 @@ public class CourseConnector {
     private static final String CLASSROOM_COURSE_URI = "https://aps.ntut.edu.tw/course/tw/Croom.jsp";
 
     public static String loginCourse() throws Exception {
+        String result = "";
         try {
             isLogin = false;
-            String result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "https://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
+            result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "https://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
             TagNode tagNode;
             tagNode = new HtmlCleaner().clean(result);
             TagNode[] nodes = tagNode.getElementsByAttValue("name",

@@ -50,6 +50,7 @@ public class PortalActivity extends AppCompatActivity {
             mProgressDialog = ProgressDialog.show(this, null,
                     getString(R.string.nportal_loggingin));
             Thread loginThread = new Thread(new LoginNportalRunnable(account, password,
+                    this,
                     new LoginHandler(this)));
             loginThread.start();
         }

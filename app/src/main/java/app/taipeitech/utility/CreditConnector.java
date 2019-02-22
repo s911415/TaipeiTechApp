@@ -190,8 +190,8 @@ public class CreditConnector {
             for (int i = 1; i < rows.length; i++) {
                 TagNode[] cols = rows[i].getElementsByName("td", true);
                 CreditInfo credit = new CreditInfo();
-                credit.setCourseNo(cols[0].getText().toString());
-                credit.setCourseName(cols[2].getText().toString());
+                credit.setCourseNo(cols[0].getText().toString().trim());
+                credit.setCourseName(cols[2].getText().toString().trim());
                 cols = rows[i].getElementsByName("th", true);
                 credit.setCredit((int) Double.parseDouble(cols[0].getText()
                         .toString()));

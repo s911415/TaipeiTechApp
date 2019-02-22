@@ -1,6 +1,8 @@
 package app.taipeitech.classroom.task;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import app.taipeitech.classroom.ClassroomFragment;
 import app.taipeitech.course.data.Semester;
@@ -44,7 +46,8 @@ public class SearchClassroomTask extends AsyncTask<String, Void, Object> {
                 if (!NportalConnector.isLogin()) {
                     String account = Model.getInstance().getAccount();
                     String password = Model.getInstance().getPassword();
-                    NportalConnector.login(account, password);
+                    WeakReference<Activity> activityWeakReference = new WeakReference<>(mClassroomFragmentWeakReference.get().getActivity());
+                    NportalConnector.login(activityWeakReference, account, password);
                 }
                 if (!CourseConnector.isLogin()) {
                     CourseConnector.loginCourse();

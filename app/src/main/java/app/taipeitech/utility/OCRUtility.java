@@ -1,11 +1,22 @@
 package app.taipeitech.utility;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import app.taipeitech.R;
+
+import java.lang.ref.WeakReference;
 
 public class OCRUtility {
 
-    public static byte[][] bitmap2grayByteArry(Bitmap bm) {
+    @Deprecated
+    private static byte[][] bitmap2grayByteArry(Bitmap bm) {
         byte[][] grayImage = new byte[bm.getHeight()][bm.getWidth()];
         for (int i = 0; i < bm.getWidth(); i++) {
             for (int j = 0; j < bm.getHeight(); j++) {
@@ -19,6 +30,7 @@ public class OCRUtility {
         return grayImage;
     }
 
+    @Deprecated
     public static String authOCR(byte[][] grayArray, int width, int height) {
         int start = -1;
         int end = -1;
@@ -44,6 +56,44 @@ public class OCRUtility {
             }
         }
         return text;
+    }
+
+    public static void authOCR(@NonNull WeakReference<Activity> activityRef, Bitmap bitmap, OCRCallback runnable) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activityRef.get());
+        builder.setTitle(R.string.nportal_auth_code_title);
+        LayoutInflater li = LayoutInflater.from(activityRef.get());
+        final View authDialogView = li.inflate(R.layout.dialog_auth_code, null);
+        builder.setView(authDialogView);
+
+        builder.setPositiveButton(R.string.nportal_auth_code_ok, (dialog, which) -> {
+            EditText authCodeView = authDialogView.findViewById(R.id.authCodeInput);
+            String authCode = authCodeView.getText().toString();
+            try {
+                dialog.dismiss();
+                new Thread(() -> runnable.run(authCode)).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        builder.setNegativeButton(R.string.nportal_auth_code_cancel, (dialog, which) -> {
+            dialog.cancel();
+        });
+        builder.setOnCancelListener((v) -> {
+            try {
+                new Thread(() -> runnable.run(null)).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        activityRef.get().runOnUiThread(() -> {
+            builder.show();
+            ((ImageView) authDialogView.findViewById(R.id.authCodeImageView)).setImageBitmap(bitmap);
+            authDialogView.findViewById(R.id.authCodeInput).requestFocus();
+        });
+    }
+
+    public interface OCRCallback {
+        void run(String authCode);
     }
 
     private static final String[] LETTERS = {"a", "b", "c", "d", "e", "f",

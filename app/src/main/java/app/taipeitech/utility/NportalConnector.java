@@ -1,23 +1,24 @@
 package app.taipeitech.utility;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.util.Base64;
-
 import app.taipeitech.runnable.LoginNportalRunnable;
-
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.HashMap;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class NportalConnector {
     private static boolean isLogin = false;
@@ -25,19 +26,33 @@ public class NportalConnector {
     private static final String LOGIN_URI = "https://nportal.ntut.edu.tw/login.do";
     public static final String NPORTAL_URI = "https://nportal.ntut.edu.tw/index.do";
 
-    public static void login(String id, String password, Handler handler) {
+    public static void login(String id, String password, Activity activity, Handler handler) {
         Thread login_thread = new Thread(new LoginNportalRunnable(id, password,
+                activity,
                 handler));
         login_thread.start();
     }
 
-    public static void login(String account, String password) throws Exception {
+    public static void login(WeakReference<Activity> activityRef, String account, String password) throws Exception {
         try {
-            Bitmap bmp = NportalConnector.loadAuthcodeImage();
-            String authcode = OCRUtility.authOCR(
-                    OCRUtility.bitmap2grayByteArry(bmp), bmp.getWidth(),
-                    bmp.getHeight());
-            NportalConnector.login(account, password, authcode);
+
+            final Bitmap bmp = NportalConnector.loadAuthcodeImage();
+            final CountDownLatch loginLatch = new CountDownLatch(1);
+            final Exception[] exception = {null};
+            OCRUtility.authOCR(activityRef, bmp, (authCode) -> {
+                try {
+                    NportalConnector.login(account, password, authCode);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    exception[0] = e;
+                } finally {
+                    loginLatch.countDown();
+                }
+            });
+            loginLatch.await();
+            bmp.recycle();
+
+            if (exception[0] != null) throw exception[0];
         } catch (Exception e) {
             reset();
             e.printStackTrace();
@@ -57,7 +72,7 @@ public class NportalConnector {
         params.put("md5Code", md5Code);
         String result;
         try {
-            result = Connector.getDataByPost(LOGIN_URI, params, "utf-8", NPORTAL_URI+"?thetime=" + String.valueOf(System.currentTimeMillis()));
+            result = Connector.getDataByPost(LOGIN_URI, params, "utf-8", NPORTAL_URI + "?thetime=" + String.valueOf(System.currentTimeMillis()));
             Connector.getDataByGet("https://nportal.ntut.edu.tw/myPortalHeader.do", "utf-8");
             Connector.getDataByGet("https://nportal.ntut.edu.tw/aptreeBox.do", "utf-8");
         } catch (Exception e) {

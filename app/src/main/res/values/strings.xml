@@ -86,6 +86,10 @@
     <string name="clear_button">清除</string>
     <string name="nportal_loggingin">校園入口網站登入中~</string>
     <string name="nportal_text"><u>校園入口網站</u></string>
+    <string name="nportal_auth_code_title">請輸入驗證碼</string>
+    <string name="nportal_auth_code_hint">請輸入驗證碼</string>
+    <string name="nportal_auth_code_ok">確認</string>
+    <string name="nportal_auth_code_cancel">取消</string>
     <string name="right_link"><u>免責聲明</u></string>
     <string name="right_text">免責聲明</string>
     <string name="right">本軟體僅提供免費測試，但不保證運作正確性，同時不承擔造成任何一方的損失、賠償、補償、資安風險與衍生責任，使用時用戶須同意自行承擔一切風險。〈同意此聲明才被授權使用本軟體，如不同意請勿安裝使用，作者保留修改權利〉</string>
