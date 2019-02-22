@@ -4,6 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:padding="@dimen/settingPadding"
+              android:paddingBottom="0dp"
 >
 
     <ImageView
@@ -11,14 +12,12 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/auth_image_sample"
             android:id="@+id/authCodeImageView"
-            android:paddingBottom="@dimen/settingPadding"
             android:scaleType="fitCenter" android:adjustViewBounds="true"/>
 
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapCharacters|textNoSuggestions"
-            android:text=""
             android:hint="@string/nportal_auth_code_hint"
             android:ems="10"
             android:id="@+id/authCodeInput"/>

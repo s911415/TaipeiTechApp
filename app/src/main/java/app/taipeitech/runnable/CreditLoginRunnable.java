@@ -18,5 +18,4 @@ public class CreditLoginRunnable extends BaseRunnable {
             sendErrorMessage(e.getMessage());
         }
     }
-
 }

@@ -7,8 +7,8 @@ android {
         applicationId "app.taipeitech"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 1902222305
-        versionName "3.3.0"
+        versionCode 1902222330
+        versionName "3.3.1"
     }
     buildTypes {
         release {
@@ -32,10 +32,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'net.sourceforge.htmlcleaner:htmlcleaner:2.14'
     implementation 'com.andreabaccega:com.triggertrap.seekarc:1.0.1'
-    implementation 'com.android.support:design:28+'
-    implementation 'com.android.support:support-v4:28+'
-    implementation 'com.android.support:recyclerview-v7:28+'
-    implementation 'com.android.support:cardview-v7:28+'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.google.code.gson:gson:2.8.2'
 }
 

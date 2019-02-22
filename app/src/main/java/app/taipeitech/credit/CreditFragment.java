@@ -7,31 +7,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 import app.taipeitech.BaseFragment;
 import app.taipeitech.R;
-import app.taipeitech.model.CreditInfo;
-import app.taipeitech.model.GeneralCredit;
-import app.taipeitech.model.Model;
-import app.taipeitech.model.SemesterCredit;
-import app.taipeitech.model.StandardCredit;
-import app.taipeitech.model.StudentCredit;
+import app.taipeitech.model.*;
 import app.taipeitech.runnable.BaseRunnable;
 import app.taipeitech.runnable.CreditLoginRunnable;
 import app.taipeitech.runnable.CreditRunnable;
@@ -262,11 +246,15 @@ public class CreditFragment extends BaseFragment implements OnClickListener,
     private void loginNportal() {
         String account = Model.getInstance().getAccount();
         String password = Model.getInstance().getPassword();
-        if (account.length() > 0 && password.length() > 0) {
+        if (!NportalConnector.isLogin()) {
             NportalConnector.login(account, password, this.getActivity(), loginHandler);
         } else {
-            pd.dismiss();
-            showAlertMessage("請先至帳號設定，設定校園入口網站帳號密碼！");
+            if (nextThread != null) {
+                nextThread.start();
+                nextThread = null;
+            } else {
+                pd.dismiss();
+            }
         }
     }
 
@@ -300,6 +288,7 @@ public class CreditFragment extends BaseFragment implements OnClickListener,
                     break;
                 case BaseRunnable.ERROR:
                     pd.dismiss();
+                    NportalConnector.reset();
                     Utility.showDialog("提示", (String) msg.obj, getActivity());
                     break;
             }
@@ -358,7 +347,7 @@ public class CreditFragment extends BaseFragment implements OnClickListener,
 
     private void queryCredit() {
         if (WifiUtility.isNetworkAvailable(getActivity())) {
-            if(Utility.checkAccount(getActivity())) {
+            if (Utility.checkAccount(getActivity())) {
                 pd = new ProgressDialog(getActivity());
                 pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 pd.setProgress(0);

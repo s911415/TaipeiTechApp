@@ -5,16 +5,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,16 +19,11 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 public class Connector {
     private static final int TIMEOUT = 10000;
     private static final int BUFFER_SIZE = 4096;
     private static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36";
-    private static TrustManager[] s_trustAllCerts = new TrustManager[] { new X509TrustManager() {
+    private static TrustManager[] s_trustAllCerts = new TrustManager[]{new X509TrustManager() {
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }
@@ -47,7 +37,7 @@ public class Connector {
         public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
             // Not implemented
         }
-    } };
+    }};
 
     static {
         try {
@@ -65,7 +55,7 @@ public class Connector {
     }
 
     public static String getDataByPost(String uri,
-                                          Map<String, String> params, String charsetName, String referer) throws Exception {
+                                       Map<String, String> params, String charsetName, String referer) throws Exception {
         URL urL = new URL(uri);
         HttpURLConnection httpURLConnection = (HttpURLConnection) urL.openConnection();
         httpURLConnection.setReadTimeout(TIMEOUT);
@@ -80,7 +70,7 @@ public class Connector {
             httpURLConnection.setRequestProperty("Referer", referer);
         }
         String paramsString = null;
-        if(params != null) {
+        if (params != null) {
             paramsString = getQuery(params);
         }
         if (!TextUtils.isEmpty(paramsString)) {
@@ -101,6 +91,11 @@ public class Connector {
                 || responseCode == HttpURLConnection.HTTP_SEE_OTHER) && redirectCount < 3) {
             // get redirect url from "location" header field
             String newUrl = httpURLConnection.getHeaderField("Location");
+
+            //  Since android pie require https connection and school require https connection, force replace url.
+            if (newUrl.startsWith("http://")) {
+                newUrl = "https://" + newUrl.substring("http://".length());
+            }
             // get the cookie if need, for login
             String cookies = httpURLConnection.getHeaderField("Set-Cookie");
             // open the new connnection again
@@ -132,7 +127,7 @@ public class Connector {
 
     public static String getDataByGet(String uri, String charsetName, String referer)
             throws Exception {
-        return convertStreamToString(getInputStreamByGet(uri,referer),
+        return convertStreamToString(getInputStreamByGet(uri, referer),
                 charsetName);
     }
 
@@ -177,7 +172,7 @@ public class Connector {
         }
     }
 
-    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection, URL url){
+    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection, URL url) {
         httpURLConnection.setRequestProperty("User-Agent", USER_AGENT);
         httpURLConnection.setRequestProperty("Upgrade-Insecure-Requests", "1");
         httpURLConnection.setRequestProperty("Connection", "keep-alive");
@@ -185,7 +180,7 @@ public class Connector {
         return httpURLConnection;
     }
 
-    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection){
+    private static HttpURLConnection setCommonRequestHeader(HttpURLConnection httpURLConnection) {
         return setCommonRequestHeader(httpURLConnection, httpURLConnection.getURL());
     }
 
@@ -278,7 +273,7 @@ public class Connector {
     }
 
     public static String getDataByHTTPSPost(String uri,
-                                       Map<String, String> params, String charsetName) throws Exception {
+                                            Map<String, String> params, String charsetName) throws Exception {
         URL urL = new URL(uri);
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection) urL.openConnection();
         httpsURLConnection.setReadTimeout(TIMEOUT);

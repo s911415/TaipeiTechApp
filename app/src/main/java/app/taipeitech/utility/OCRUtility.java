@@ -2,11 +2,13 @@ package app.taipeitech.utility;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import app.taipeitech.R;
@@ -69,6 +71,10 @@ public class OCRUtility {
             EditText authCodeView = authDialogView.findViewById(R.id.authCodeInput);
             String authCode = authCodeView.getText().toString();
             try {
+                InputMethodManager imm = (InputMethodManager) (activityRef.get().getSystemService(Context.INPUT_METHOD_SERVICE));
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(authCodeView.getWindowToken(), 0);
+                }
                 dialog.dismiss();
                 new Thread(() -> runnable.run(authCode)).start();
             } catch (Exception e) {
@@ -88,7 +94,14 @@ public class OCRUtility {
         activityRef.get().runOnUiThread(() -> {
             builder.show();
             ((ImageView) authDialogView.findViewById(R.id.authCodeImageView)).setImageBitmap(bitmap);
-            authDialogView.findViewById(R.id.authCodeInput).requestFocus();
+            EditText authCodeInput = authDialogView.findViewById(R.id.authCodeInput);
+            authCodeInput.requestFocus();
+            authCodeInput.postDelayed(() -> {
+                InputMethodManager imm = (InputMethodManager) (activityRef.get().getSystemService(Context.INPUT_METHOD_SERVICE));
+                if (imm != null) {
+                    imm.showSoftInput(authCodeInput, 0);
+                }
+            }, 200);
         });
     }
 
