@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class CourseConnector {
     private static boolean isLogin = false;
-    private static final String POST_COURSES_URI = "https://nportal.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=https://aps.ntut.edu.tw/course/tw/courseSID.jsp";
+    private static final String POST_COURSES_URI = "https://app.ntut.edu.tw/ssoIndex.do?apOu=aa_0010-&apUrl=https://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSES_URI = "https://aps.ntut.edu.tw/course/tw/courseSID.jsp";
     private static final String COURSE_URI = "https://aps.ntut.edu.tw/course/tw/Select.jsp";
     private static final String CLASSROOM_URI = "https://aps.ntut.edu.tw/course/tw/Croom.jsp";
@@ -25,7 +25,7 @@ public class CourseConnector {
     public static String loginCourse() throws Exception {
         try {
             isLogin = false;
-            String result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "https://nportal.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
+            String result = Connector.getDataByGet(POST_COURSES_URI, "utf-8", "https://app.ntut.edu.tw/aptreeList.do?apDn=ou=aa,ou=aproot,o=ldaproot");
             TagNode tagNode;
             tagNode = new HtmlCleaner().clean(result);
             TagNode[] nodes = tagNode.getElementsByAttValue("name",

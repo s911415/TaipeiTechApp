@@ -27,7 +27,7 @@ import java.net.HttpCookie;
 import java.net.URI;
 
 public class PortalActivity extends AppCompatActivity {
-    private static final String PORTAL_URL = "https://nportal.ntut.edu.tw/";
+    private static final String PORTAL_URL = "https://app.ntut.edu.tw/";
     private Toolbar mToolbar;
     private ProgressDialog mProgressDialog;
 

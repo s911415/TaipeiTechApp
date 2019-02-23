@@ -101,6 +101,12 @@ public class Connector {
                 || responseCode == HttpURLConnection.HTTP_SEE_OTHER) && redirectCount < 3) {
             // get redirect url from "location" header field
             String newUrl = httpURLConnection.getHeaderField("Location");
+
+            //  Since android pie require https connection and school require https connection, force replace url.
+            if (newUrl.startsWith("http://")) {
+                newUrl = "https://" + newUrl.substring("http://".length());
+            }
+
             // get the cookie if need, for login
             String cookies = httpURLConnection.getHeaderField("Set-Cookie");
             // open the new connnection again
