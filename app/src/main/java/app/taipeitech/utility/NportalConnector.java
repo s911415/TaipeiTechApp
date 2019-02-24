@@ -35,6 +35,16 @@ public class NportalConnector {
 
     public static void login(WeakReference<Activity> activityRef, String account, String password) throws Exception {
         try {
+            NportalConnector.login(account, password);
+        } catch (Exception e) {
+            reset();
+            e.printStackTrace();
+            throw new Exception("登入校園入口網站時發生錯誤");
+        }
+    }
+
+    public static void oldLogin(WeakReference<Activity> activityRef, String account, String password) throws Exception {
+        try {
 
             final Bitmap bmp = NportalConnector.loadAuthcodeImage();
             final CountDownLatch loginLatch = new CountDownLatch(1);
@@ -83,6 +93,31 @@ public class NportalConnector {
             throw new Exception("帳號或密碼錯誤");
         } else if (result.contains("驗證碼")) {
             throw new Exception("驗證碼錯誤");
+        }
+        isLogin = true;
+        return result;
+    }
+
+    public static String login(String muid, String mpassword)
+            throws Exception {
+        isLogin = false;
+        HashMap<String, String> params = new HashMap<>();
+        params.put("muid", muid);
+        params.put("mpassword", mpassword);
+        params.put("forceMobile", "app");
+        String md5Code = getMD5Code(muid, mpassword);
+        params.put("md5Code", md5Code);
+        String result;
+        try {
+            result = Connector.getDataByPost(LOGIN_URI, params, "utf-8", NPORTAL_URI + "?thetime=" + String.valueOf(System.currentTimeMillis()));
+            Connector.getDataByGet("https://nportal.ntut.edu.tw/myPortalHeader.do", "utf-8");
+            Connector.getDataByGet("https://nportal.ntut.edu.tw/aptreeBox.do", "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("入口網站登入時發生錯誤");
+        }
+        if (result.contains("帳號或密碼錯誤")) {
+            throw new Exception("帳號或密碼錯誤");
         }
         isLogin = true;
         return result;

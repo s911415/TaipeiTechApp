@@ -24,6 +24,15 @@ public class LoginNportalRunnable extends BaseRunnable {
     @Override
     public void run() {
         try {
+            String result = NportalConnector.login(account, password);
+            sendRefreshMessage(result);
+        } catch (Exception e) {
+            sendErrorMessage(e.getMessage());
+        }
+    }
+
+    public void oldRun() {
+        try {
             Bitmap bmp = NportalConnector.loadAuthcodeImage();
             final CountDownLatch loginLatch = new CountDownLatch(1);
             final Exception[] exception = {null};

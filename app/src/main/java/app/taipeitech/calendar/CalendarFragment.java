@@ -99,7 +99,7 @@ public class CalendarFragment extends BaseFragment implements OnClickListener,
         if (WifiUtility.isNetworkAvailable(getActivity())) {
             progressDialog = ProgressDialog.show(getActivity(), null, "資料讀取中~",
                     true);
-            Thread t = new Thread(new CalendarRunnable(
+            Thread t = new Thread(new CalendarRunnable(this.getActivity(),
                     new CalendarHandler(this)));
             t.start();
         } else {

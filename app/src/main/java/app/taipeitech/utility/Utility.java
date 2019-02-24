@@ -177,7 +177,7 @@ public class Utility {
         return infos;
     }
 
-    public static int convertTime(String t){
+    public static int convertTime(String t) {
         switch (t) {
             case "A":
                 return 10;
@@ -203,6 +203,10 @@ public class Utility {
     public static String getDate(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
+        return getDate(cal);
+    }
+
+    public static String getDate(Calendar cal) {
         int date_no = cal.get(Calendar.DAY_OF_MONTH);
         return String.valueOf(date_no);
     }
@@ -210,6 +214,10 @@ public class Utility {
     public static String getMonth(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
+        return getMonth(cal);
+    }
+
+    public static String getMonth(Calendar cal) {
         int month = cal.get(Calendar.MONTH) + 1;
         return String.valueOf(month);
     }
@@ -217,16 +225,32 @@ public class Utility {
     public static String getYear(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
+        return getYear(cal);
+    }
+
+    public static String getYear(Calendar cal) {
         int year = cal.get(Calendar.YEAR);
         return String.valueOf(year);
     }
 
+    private static final String[] WEEKDAYS = new String[]{"", "日", "一", "二", "三", "四", "五", "六"};
+
     public static String getDateString(String format, Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.TAIWAN);
         DateFormatSymbols dfs = new DateFormatSymbols();
-        dfs.setShortWeekdays(new String[]{"", "日", "一", "二", "三", "四", "五", "六"});
+        dfs.setShortWeekdays(WEEKDAYS);
         sdf.setDateFormatSymbols(dfs);
         return sdf.format(date);
+    }
+
+
+    public static String getDateString(String format, Calendar cal) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.TAIWAN);
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        dfs.setShortWeekdays(WEEKDAYS);
+        sdf.setDateFormatSymbols(dfs);
+        sdf.setTimeZone(cal.getTimeZone());
+        return sdf.format(cal.getTime());
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

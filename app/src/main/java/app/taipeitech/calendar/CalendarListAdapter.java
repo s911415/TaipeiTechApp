@@ -3,6 +3,7 @@ package app.taipeitech.calendar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.CalendarContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ import app.taipeitech.R;
 import app.taipeitech.model.EventInfo;
 import app.taipeitech.utility.Utility;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,6 +26,7 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
     private static final int LAYOUT_ID = R.layout.calendar_item;
     private LayoutInflater inflater;
     private EventInfo selectedEvent;
+    private static final String DATETIME_FORMAT = "yyyy/MM/dd (E)";
 
     public CalendarListAdapter(Context context, List<EventInfo> objects) {
         super(context, LAYOUT_ID, objects);
@@ -49,9 +51,9 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
             holder = (ViewHolder) convertView.getTag();
         }
         EventInfo event = getItem(position);
-        Date startDate = event.getStartDate();
-        holder.date_textview.setText(Utility.getDate(startDate));
-        holder.day_textview.setText(Utility.getDateString("E", startDate));
+        Calendar startDateCal = event.getStartDateCal();
+        holder.date_textview.setText(Utility.getDate(startDateCal));
+        holder.day_textview.setText(Utility.getDateString("E", startDateCal));
         holder.event_textview.setText(event.getEvent());
 
         convertView.setTag(R.id.data_tag, event);
@@ -71,23 +73,24 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
         Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("活動內容");
         String message = null;
-        if (selectedEvent.getStartDate().compareTo(selectedEvent.getEndDate()) == 0) {
+        if (selectedEvent.isOneDayEvent()) {
             message = String.format(
                     Locale.TAIWAN,
                     "%s\n\n時間：%s",
                     selectedEvent.getEvent(),
-                    Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getStartDate()));
+                    Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getStartDateCal()));
         } else {
             message = String.format(
                     Locale.TAIWAN,
                     "%s\n\n開始時間：%s\n結束時間：%s",
                     selectedEvent.getEvent(),
-                    Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getStartDate()),
-                    Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getEndDate()));
+                    Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getStartDateCal()),
+                    Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getEndDateCal()));
         }
+
         builder.setMessage(message);
         builder.setNegativeButton(R.string.add_to_calendar, this);
         builder.setPositiveButton(R.string.share_using, this);
@@ -99,15 +102,23 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
         switch (position) {
             case DialogInterface.BUTTON_NEGATIVE:
                 try {
-                    Intent calendar_intent = new Intent(Intent.ACTION_EDIT);
-                    calendar_intent.setType("vnd.android.cursor.item/event");
-                    calendar_intent.putExtra("beginTime", selectedEvent
-                            .getStartDate().getTime());
-                    calendar_intent.putExtra("allDay", true);
-                    calendar_intent.putExtra("endTime", selectedEvent.getEndDate()
-                            .getTime() + 60 * 60 * 1000);
-                    calendar_intent.putExtra("title", selectedEvent.getEvent());
-                    getContext().startActivity(calendar_intent);
+                    Intent calendarIntent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
+                    calendarIntent.setData(CalendarContract.Events.CONTENT_URI);
+
+                    calendarIntent.setType("vnd.android.cursor.item/event");
+
+                    calendarIntent.putExtra(CalendarContract.Events.DTSTART, selectedEvent
+                            .getStartDateCal().getTimeInMillis());
+                    calendarIntent.putExtra(CalendarContract.Events.DTEND,
+                            selectedEvent.getEndDateCal().getTimeInMillis());
+                    calendarIntent.putExtra(CalendarContract.Events.EVENT_TIMEZONE,
+                            selectedEvent.getStartDateCal().getTimeZone().getID());
+
+                    calendarIntent.putExtra(CalendarContract.Events.ALL_DAY, true);
+
+                    calendarIntent.putExtra(CalendarContract.Events.TITLE, selectedEvent.getEvent());
+
+                    getContext().startActivity(calendarIntent);
                 } catch (Exception e) {
                     Toast.makeText(getContext(), R.string.calendar_not_support,
                             Toast.LENGTH_SHORT).show();
@@ -115,18 +126,17 @@ public class CalendarListAdapter extends ArrayAdapter<EventInfo> implements
                 break;
             case DialogInterface.BUTTON_POSITIVE:
                 String shareBody = null;
-                if (selectedEvent.getStartDate().compareTo(
-                        selectedEvent.getEndDate()) == 0) {
-                    shareBody = Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getStartDate())
+                if (selectedEvent.isOneDayEvent()) {
+                    shareBody = Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getStartDateCal())
                             + " "
                             + selectedEvent.getEvent();
                 } else {
-                    shareBody = Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getStartDate())
+                    shareBody = Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getStartDateCal())
                             + "~"
-                            + Utility.getDateString("yyyy/MM/dd (E)",
-                            selectedEvent.getEndDate())
+                            + Utility.getDateString(DATETIME_FORMAT,
+                            selectedEvent.getEndDateCal())
                             + " "
                             + selectedEvent.getEvent();
                 }

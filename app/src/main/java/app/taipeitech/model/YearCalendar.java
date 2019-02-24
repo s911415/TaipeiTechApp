@@ -4,20 +4,25 @@ import app.taipeitech.utility.Utility;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 public class YearCalendar {
-    private ArrayList<EventInfo> eventList = null;
+    private List<EventInfo> eventList = null;
     private String semester = null;
 
-    public ArrayList<EventInfo> getEventList() {
+    public YearCalendar() {
+    }
+
+    public YearCalendar(String semester, List<EventInfo> eventInfoList) {
+        this.semester = semester;
+        this.eventList = eventInfoList;
+    }
+
+    public List<EventInfo> getEventList() {
         return eventList;
     }
 
-    public void setEventList(ArrayList<EventInfo> eventList) {
+    public void setEventList(List<EventInfo> eventList) {
         this.eventList = eventList;
     }
 
@@ -33,8 +38,8 @@ public class YearCalendar {
         this.semester = semester;
     }
 
-    public ArrayList<EventInfo> searchEventList(String keyword) {
-        ArrayList<EventInfo> resultList = new ArrayList<EventInfo>();
+    public List<EventInfo> searchEventList(String keyword) {
+        List<EventInfo> resultList = new ArrayList<>();
         if (eventList != null && keyword != null) {
             for (EventInfo eventInfo : eventList) {
                 if (eventInfo.getEvent().contains(keyword)) {
@@ -45,13 +50,13 @@ public class YearCalendar {
         return resultList;
     }
 
-    public ArrayList<EventInfo> getMonthEventList(String year, String month) {
-        ArrayList<EventInfo> resultList = new ArrayList<EventInfo>();
+    public List<EventInfo> getMonthEventList(String year, String month) {
+        List<EventInfo> resultList = new ArrayList<>();
         if (eventList != null && month != null) {
             for (EventInfo eventInfo : eventList) {
-                if (Utility.getMonth(eventInfo.getStartDate()).equals(month)
-                        && Utility.getYear(eventInfo.getStartDate()).equals(
-                        year)) {
+                if (Utility.getMonth(eventInfo.getStartDateCal()).equals(month)
+                        && Utility.getYear(eventInfo.getStartDateCal()).equals(
+                        year) && eventInfo.getId() != null) {
                     resultList.add(eventInfo);
                 }
             }
@@ -72,11 +77,11 @@ public class YearCalendar {
         return date;
     }
 
-    public ArrayList<String> findEvents(Date date) {
-        ArrayList<String> resultList = new ArrayList<String>();
+    public List<String> findEvents(Date date) {
+        List<String> resultList = new ArrayList<>();
         if (eventList != null && date != null) {
             for (EventInfo eventInfo : eventList) {
-                if (eventInfo.getStartDate().equals(date)) {
+                if (eventInfo.getStartDateCal().getTime().equals(date)) {
                     resultList.add(eventInfo.getEvent());
                 }
             }

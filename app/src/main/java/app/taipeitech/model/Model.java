@@ -11,7 +11,7 @@ public class Model {
     private static final String STUDENT_COURSE_NAME = "studentCourse";
     private static final String STUDENT_CREDIT_NAME = "studentCredit";
     private static final String STANDARD_CREDIT_NAME = "standardCredit";
-    private static final String YEAR_CALENDAR_NAME = "yearCalendar";
+    private static final String APP_CALENDAR_NAME = "appCalendar";
     private static final String CLASSROOMS_NAME = "classroomList";
     private static final String ACTIVITY_ARRAY_NAME = "activityArray";
     private volatile static Model instance = null;
@@ -44,7 +44,7 @@ public class Model {
                 StudentCredit.class);
         standardCredit = readObjectSetting(STANDARD_CREDIT_NAME,
                 StandardCredit.class);
-        yearCalendar = readObjectSetting(YEAR_CALENDAR_NAME, YearCalendar.class);
+        yearCalendar = readObjectSetting(APP_CALENDAR_NAME, YearCalendar.class);
         classroomsInfo = readObjectSetting(CLASSROOMS_NAME, ClassroomsInfo.class);
         activityArray = readObjectSetting(ACTIVITY_ARRAY_NAME,
                 ActivityList.class);
@@ -168,7 +168,7 @@ public class Model {
     }
 
     public void saveYearCalendar() {
-        saveObjectSetting(YEAR_CALENDAR_NAME, yearCalendar);
+        saveObjectSetting(APP_CALENDAR_NAME, yearCalendar);
     }
 /*
     public ActivityList getActivityArray() {

@@ -13,6 +13,7 @@ import app.taipeitech.model.Model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class CalendarPageAdapter extends PagerAdapter {
     private Model model = Model.getInstance();
@@ -46,7 +47,7 @@ public class CalendarPageAdapter extends PagerAdapter {
         temp_calendar.add(Calendar.MONTH, position - 1);
         year = String.valueOf(temp_calendar.get(Calendar.YEAR));
         month = String.valueOf(temp_calendar.get(Calendar.MONTH) + 1);
-        ArrayList<EventInfo> event_list = model.getYearCalendar()
+        List<EventInfo> event_list = model.getYearCalendar()
                 .getMonthEventList(year, month);
         listView.setAdapter(new CalendarListAdapter(context, event_list));
         container.addView(listView);
