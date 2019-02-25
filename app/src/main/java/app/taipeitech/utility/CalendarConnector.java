@@ -28,14 +28,11 @@ public class CalendarConnector {
             for (EventInfo e : eventInfos) {
                 if (e.getId() != null) eventInfoArrayList.add(e);
             }
-            Collections.sort(eventInfoArrayList, (e1, e2) -> {
-                int startCmp = e1.getStartDateCal().compareTo(e2.getEndDateCal());
-                if (startCmp != 0) return startCmp;
-                return e1.getId().compareTo(e2.getId());
-            });
+
             YearCalendar yearCalendar = new YearCalendar(String.valueOf(currentSem), eventInfoArrayList);
             return yearCalendar;
         } catch (Exception e) {
+            NportalConnector.reset();
             e.printStackTrace();
             throw new Exception("行事曆讀取時發生錯誤");
         }

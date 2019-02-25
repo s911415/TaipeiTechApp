@@ -1,11 +1,13 @@
 package app.taipeitech.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-public class EventInfo {
+public class EventInfo implements Comparable<EventInfo> {
     private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("Asia/Taipei");
     private final Integer id;
     private final Long calStart;
@@ -89,5 +91,12 @@ public class EventInfo {
         Calendar cal = Calendar.getInstance(TIME_ZONE);
         cal.setTime(new Date(timestamp));
         return cal;
+    }
+
+    @Override
+    public int compareTo(@NonNull EventInfo o) {
+        int startCmp = calStart.compareTo(o.calStart);
+        if (startCmp != 0) return startCmp;
+        return calEnd.compareTo(o.calEnd);
     }
 }

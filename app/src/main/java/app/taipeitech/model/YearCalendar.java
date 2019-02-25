@@ -61,6 +61,9 @@ public class YearCalendar {
                 }
             }
         }
+
+        Collections.sort(resultList);
+
         return resultList;
     }
 
