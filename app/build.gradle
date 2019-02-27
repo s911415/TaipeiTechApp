@@ -7,8 +7,8 @@ android {
         applicationId "app.taipeitech"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 1902241244
-        versionName "3.3.2"
+        versionCode 1902271123
+        versionName "3.3.2.1"
     }
     buildTypes {
         release {

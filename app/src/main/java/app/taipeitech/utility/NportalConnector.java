@@ -17,11 +17,15 @@ import java.lang.ref.WeakReference;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class NportalConnector {
+    private static final long SESSION_TIMEOUT = TimeUnit.MILLISECONDS.convert(15, TimeUnit.MINUTES);
     private static boolean isLogin = false;
+    private static long lastLoginTime = 0;
     private static final String IMAGE_URI = "https://nportal.ntut.edu.tw/authImage.do";
     private static final String LOGIN_URI = "https://nportal.ntut.edu.tw/login.do";
     public static final String NPORTAL_URI = "https://nportal.ntut.edu.tw/index.do";
@@ -72,7 +76,7 @@ public class NportalConnector {
 
     public static String login(String muid, String mpassword, String authcode)
             throws Exception {
-        isLogin = false;
+        setLoginStatus(false);
         HashMap<String, String> params = new HashMap<>();
         params.put("muid", muid);
         params.put("mpassword", mpassword);
@@ -94,13 +98,13 @@ public class NportalConnector {
         } else if (result.contains("驗證碼")) {
             throw new Exception("驗證碼錯誤");
         }
-        isLogin = true;
+        setLoginStatus(true);
         return result;
     }
 
     public static String login(String muid, String mpassword)
             throws Exception {
-        isLogin = false;
+        setLoginStatus(false);
         HashMap<String, String> params = new HashMap<>();
         params.put("muid", muid);
         params.put("mpassword", mpassword);
@@ -119,7 +123,7 @@ public class NportalConnector {
         if (result.contains("帳號或密碼錯誤")) {
             throw new Exception("帳號或密碼錯誤");
         }
-        isLogin = true;
+        setLoginStatus(true);
         return result;
     }
 
@@ -141,11 +145,23 @@ public class NportalConnector {
     }
 
     public static boolean isLogin() {
+        if (!isLogin) return isLogin;
+        long currentTime = new Date().getTime();
+        if (currentTime - lastLoginTime > SESSION_TIMEOUT) return false;
         return isLogin;
     }
 
+    private static void setLoginStatus(boolean status) {
+        if (status) {
+            isLogin = true;
+            lastLoginTime = new Date().getTime();
+        } else {
+            isLogin = false;
+        }
+    }
+
     public static void reset() {
-        isLogin = false;
+        setLoginStatus(false);
     }
 
     private static String getMD5Code(String account, String password) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {

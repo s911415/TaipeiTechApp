@@ -47,6 +47,7 @@ public class SearchCourseTask extends AsyncTask<String, Void, Object> {
                     String password = Model.getInstance().getPassword();
                     WeakReference<Activity> activityWeakReference = new WeakReference<>(mProgressDialogWeakReference.get().getOwnerActivity());
                     NportalConnector.login(activityWeakReference, account, password);
+                    CourseConnector.loginCourse();
                 }
                 if (!CourseConnector.isLogin()) {
                     CourseConnector.loginCourse();

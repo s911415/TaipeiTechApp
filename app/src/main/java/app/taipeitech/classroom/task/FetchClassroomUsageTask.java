@@ -46,6 +46,7 @@ public class FetchClassroomUsageTask extends AsyncTask<String, Void, Object> {
                     String password = Model.getInstance().getPassword();
                     WeakReference<Activity> activityWeakReference = new WeakReference<>(mClassroomFragmentWeakReference.get().getActivity());
                     NportalConnector.login(activityWeakReference, account, password);
+                    CourseConnector.loginCourse();
                 }
                 if (!CourseConnector.isLogin()) {
                     CourseConnector.loginCourse();

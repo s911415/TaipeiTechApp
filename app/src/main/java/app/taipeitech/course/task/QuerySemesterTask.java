@@ -47,6 +47,7 @@ public class QuerySemesterTask extends AsyncTask<String, Void, Object> {
                     String password = Model.getInstance().getPassword();
                     WeakReference<Activity> contextWeakReference = new WeakReference<>(mCourseFragmentWeakReference.get().getActivity());
                     NportalConnector.login(contextWeakReference, account, password);
+                    CourseConnector.loginCourse();
                 }
                 if (!CourseConnector.isLogin()) {
                     CourseConnector.loginCourse();
